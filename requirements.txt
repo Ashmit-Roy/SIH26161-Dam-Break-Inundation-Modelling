@@ -1,0 +1,27 @@
+# Core scientific computing
+numpy
+pandas
+
+# GIS / geospatial
+rasterio
+geopandas
+shapely
+
+# Google Earth Engine
+earthengine-api
+
+# Dashboard backend (FastAPI)
+fastapi
+uvicorn[standard]
+
+# Data validation / settings
+pydantic
+python-dotenv
+
+# Testing / linting / type checking
+pytest
+ruff
+mypy
+
+# NOTE: Keep this file minimal. Add a dependency only when it is
+# actually required by implemented code (see AGENTS.md section 29).

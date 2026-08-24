@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# Testing / tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environment / secrets
+.env
+.env.*
+*.key
+
+# Jupyter
+.ipynb_checkpoints/
+
+# GIS / large data artifacts (do not commit large datasets)
+*.tif
+*.tiff
+*.asc
+*.grd
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+*.kml
+*.kmz
+*.geojson
+*.gpkg
+*.hdf5
+*.h5
+*.nc
+
+# Simulation outputs / generated files
+output/
+outputs/
+results/
+*.vtk
+*.bi4
+*.Part*
+*.Resume*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
