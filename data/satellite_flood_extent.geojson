@@ -1,0 +1,49 @@
+{
+  "type": "FeatureCollection",
+  "name": "satellite_detected_flood_extent",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "event": "Post-Dam-Break-Inundation",
+        "satellite": "Sentinel-1 IW GRD",
+        "detection_method": "SAR Backscatter Threshold + RF ML Classifier",
+        "flooded_area_ha": 24.57,
+        "flooded_area_km2": 0.2457
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              75.85,
+              31.25
+            ],
+            [
+              76.15,
+              31.25
+            ],
+            [
+              76.1,
+              31.55
+            ],
+            [
+              75.8,
+              31.5
+            ],
+            [
+              75.85,
+              31.25
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}
