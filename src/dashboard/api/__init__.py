@@ -1,4 +1,4 @@
-from .simulation import simulation_router
-from .results import results_router
+from .results import router as results_router
+from .simulation import router as simulation_router
 
 __all__ = ["simulation_router", "results_router"]

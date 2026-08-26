@@ -1,13 +1,11 @@
-from ..src.dashboard.models import (
-    SimulationRequest,
-    SimulationMetadata,
-    ModelType,
+from src.dashboard.models import (
     ComparisonMetric,
-    WaterDepthResult,
-    FloodExtentResult,
-    ComparisonResult,
-    DownloadRequest,
     DashboardState,
+    DownloadRequest,
+    FloodExtentResult,
+    ModelType,
+    SimulationRequest,
+    WaterDepthResult,
 )
 
 
@@ -61,4 +59,4 @@ def test_download_request():
 def test_dashboard_state():
     state = DashboardState()
     assert state.simulation_progress == 0.0
-    assert state.comparison_active == False
+    assert not state.comparison_active

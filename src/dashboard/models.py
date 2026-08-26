@@ -1,6 +1,7 @@
-from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any
 from enum import Enum
+from typing import Any, Dict, Optional
+
+from pydantic import BaseModel, Field
 
 
 class ModelType(str, Enum):
@@ -27,13 +28,13 @@ class SimulationRequest(BaseModel):
 
 class SimulationMetadata(BaseModel):
     terrain_reference: Optional[str] = Field(None, description="DEM reference")
-    dam_location: Optional[Dict[str, float]] = Field(None, description={"lat": float, "lon": float})
+    dam_location: Optional[Dict[str, float]] = Field(None, description="Dam location lat/lon")
     initial_water_level: Optional[float] = Field(None, description="Initial water level in meters")
 
 
 class WaterDepthResult(BaseModel):
     simulation_id: str
-    location: Dict[str, float] = Field(..., description={"lat": float, "lon": float})
+    location: Dict[str, float] = Field(..., description="Location lat/lon")
     water_depth: float = Field(..., description="Water depth in meters")
     timestamp: Optional[str] = Field(None, description="ISO8601 timestamp")
 
