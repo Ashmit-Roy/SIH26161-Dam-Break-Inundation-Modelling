@@ -1,6 +1,4 @@
 import React from "react";
-import { ComparisonResult } from "../types";
-import { SAMPLE_COMPARISON } from "../data/mockData";
 
 function ComparisonPanel({
   comparison,

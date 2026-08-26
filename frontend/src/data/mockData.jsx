@@ -1,18 +1,3 @@
-import {
-  WaterDepthResult,
-  FloodExtentResult,
-  ComparisonResult,
-  DownloadRequest,
-  DashboardState,
-  ModelType,
-  ComparisonMetric,
-  SimulationFormValues,
-  Location,
-  SimulationRequest,
-  SimulationMetadata,
-  DemoScenario,
-} from "../types";
-
 // ============================================================
 // MOCK GEOJSON DATA FOR SIH26161 DEMONSTRATION
 // ============================================================

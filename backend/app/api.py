@@ -1,9 +1,9 @@
-from backend.app.models import (
+from .models import (
     SimulationRequest,
     SimulationResultResponse,
     SimulationStatusResponse,
 )
-from backend.app.services import SimulationService
+from .services import SimulationService
 from fastapi import APIRouter
 
 router = APIRouter(prefix="/api", tags=["simulation"])

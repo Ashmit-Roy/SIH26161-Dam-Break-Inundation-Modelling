@@ -28,11 +28,15 @@ def create_app() -> FastAPI:
     # CORS configuration for frontend
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://127.0.0.1:5173", "http://localhost:5173"],
+        allow_origins=["http://127.0.0.1:5173", "http://localhost:5173", "http://localhost:3000"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    # Preload initial sample simulations
+    from .services import setup_sample_data
+    setup_sample_data()
 
     # Include API routes
     app.include_router(api_router)
@@ -49,8 +53,12 @@ def create_app() -> FastAPI:
     return app
 
 
+# Expose module-level app instance for uvicorn (e.g. `uvicorn app.main:app`)
+app = create_app()
+
+
 if __name__ == "__main__":
     import uvicorn
 
-    app_ = create_app()
-    uvicorn.run(app_, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=8000)
+

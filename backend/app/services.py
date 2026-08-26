@@ -3,7 +3,7 @@ import datetime
 import uuid
 from typing import Dict
 
-from backend.app.models import (
+from .models import (
     DamageStatistics,
     FloodExtentResult,
     ModelType,
@@ -220,9 +220,7 @@ class SimulationService:
             )
 
         state = _simulation_store[simulation_id]
-        from backend.app.models import Model as ModelEnum
-
-        model = ModelEnum(state["model"])
+        model = ModelType(state["model"])
 
         # Execute appropriate mock model
         if model == ModelType.SPH:
@@ -251,10 +249,8 @@ class SimulationService:
         # Build comparison if both models available
         comparison = None
         if state.get("comparison_data"):
-            from backend.app.models import (
+            from .models import (
                 ComparisonMetric,
-            )
-            from backend.app.models import (
                 ModelComparisonResult as MCR,
             )
 
@@ -265,19 +261,6 @@ class SimulationService:
                 timestamp=datetime.datetime.utcnow().isoformat() + "Z",
                 overlap_area=state["comparison_data"].get("overlap_area"),
             )
-
-        # Build damage statistics
-        return DamageStatistics(
-            population_affected=1250,
-            population_at_risk=3400,
-            residential_units_destroyed=89,
-            residential_units_damaged=234,
-            road_km_affected=15.3,
-            bridge_count_affected=2,
-            land_area_flooded_km2=8.7,
-            evacuation_centers_needed=3,
-            timestamp=datetime.datetime.utcnow().isoformat() + "Z",
-        )
 
         return SimulationResultResponse(
             simulation_id=simulation_id,
@@ -296,75 +279,169 @@ class SimulationService:
     @staticmethod
     async def download_result(
         simulation_id: str, format: str
-    ) -> Dict:
-        """Request download of simulation results."""
+    ):
+        """Request download of simulation results in real file format."""
         if simulation_id not in _simulation_store:
             from fastapi import HTTPException
             raise HTTPException(
                 status_code=404, detail="Simulation not found"
             )
 
-        valid_formats = ["shp", "kml", "geojson"]
+        state = _simulation_store[simulation_id]
+        valid_formats = ["shp", "kml", "geojson", "json"]
         if format.lower() not in valid_formats:
-            raise ValueError(
-                f"Invalid format: {format}. Must be one of {valid_formats}"
+            from fastapi import HTTPException
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid format: {format}. Must be one of {valid_formats}"
             )
 
-        filename = f"{simulation_id}.{format}"
+        from fastapi.responses import Response
+        import json
 
-        return {
-            "success": True,
-            "simulation_id": simulation_id,
-            "format": format,
-            "filename": filename,
-            "message": f"Download ready for {simulation_id} in {format} format",
-        }
+        model_name = state.get("model", "SPH")
+        poly = [
+            [100.42, 6.12],
+            [100.38, 6.35],
+            [100.55, 6.42],
+            [100.62, 6.20],
+            [100.42, 6.12],
+        ]
+
+        if format.lower() in ["geojson", "json"]:
+            geojson_data = {
+                "type": "FeatureCollection",
+                "name": f"flood_inundation_{simulation_id}",
+                "crs": {
+                    "type": "name",
+                    "properties": {"name": "urn:ogc:def:crs:OGC:1.3:CRS84"}
+                },
+                "features": [
+                    {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [poly],
+                        },
+                        "properties": {
+                            "simulation_id": simulation_id,
+                            "model": model_name,
+                            "scenario_id": state.get("scenario_id", "scenario_a"),
+                            "breach_width_m": state.get("breach_width", 10.0),
+                            "breach_height_m": state.get("breach_height", 2.0),
+                            "max_water_depth_m": 3.85 if model_name == "SPH" else 4.12,
+                            "arrival_time_min": 12.5 if model_name == "SPH" else 11.8,
+                            "generated_at": datetime.datetime.utcnow().isoformat() + "Z",
+                        },
+                    }
+                ],
+            }
+            content = json.dumps(geojson_data, indent=2)
+            return Response(
+                content=content,
+                media_type="application/geo+json",
+                headers={
+                    "Content-Disposition": f"attachment; filename={simulation_id}.geojson",
+                    "Access-Control-Expose-Headers": "Content-Disposition",
+                },
+            )
+
+        elif format.lower() == "kml":
+            kml_coords = " ".join([f"{lon},{lat},0" for lon, lat in poly])
+            kml_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Dam Break Flood Inundation - {simulation_id}</name>
+    <description>SIH26161 Dam Break Inundation Model Output ({model_name})</description>
+    <Style id="floodPoly">
+      <LineStyle><color>ff0000ff</color><width>2</width></LineStyle>
+      <PolyStyle><color>7f0000ff</color></PolyStyle>
+    </Style>
+    <Placemark>
+      <name>Flood Extent ({model_name})</name>
+      <styleUrl>#floodPoly</styleUrl>
+      <Polygon>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>{kml_coords}</coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+  </Document>
+</kml>"""
+            return Response(
+                content=kml_content,
+                media_type="application/vnd.google-earth.kml+xml",
+                headers={
+                    "Content-Disposition": f"attachment; filename={simulation_id}.kml",
+                    "Access-Control-Expose-Headers": "Content-Disposition",
+                },
+            )
+
+        else:  # shp
+            meta_json = json.dumps({
+                "message": "Shapefile bundle metadata. Use GeoJSON/KML for web GIS direct import.",
+                "simulation_id": simulation_id,
+                "format": "Shapefile (.shp)",
+                "layers": ["inundation_extent", "depth_contours", "dam_location"],
+                "crs": "EPSG:4326",
+            }, indent=2)
+            return Response(
+                content=meta_json,
+                media_type="application/json",
+                headers={
+                    "Content-Disposition": f"attachment; filename={simulation_id}_shp_meta.json",
+                    "Access-Control-Expose-Headers": "Content-Disposition",
+                },
+            )
 
 
 # Setup function to initialize sample data
 def setup_sample_data():
     """Initialize sample simulations for testing."""
-
-    # Create a SPH simulation
-    from backend.app.models import ModelType, SimulationRequest
-
-    sph_request = SimulationRequest(
-        simulation_id="sim_sph_001",
-        model=ModelType.SPH,
-        scenario_id="scenario_a",
-        breach_width=10.0,
-        breach_height=2.0,
-    )
-
-    sph_status = asyncio.run(SimulationService.start_simulation(sph_request))
-
-    # Advance to completed status
-    for _ in range(10):
-        status = asyncio.run(SimulationService.get_simulation_status(sph_status.simulation_id))
-        if status.status.name == "COMPLETED":
-            break
-
-    # Create a Delft3D simulation
-    delft_request = SimulationRequest(
-        simulation_id="sim_delft3d_001",
-        model=ModelType.DELFT3D,
-        scenario_id="scenario_b",
-        breach_width=15.0,
-        breach_height=3.0,
-    )
-
-    delft_status = asyncio.run(SimulationService.start_simulation(delft_request))
-
-    # Advance to completed status
-    for _ in range(10):
-        status = asyncio.run(SimulationService.get_simulation_status(delft_status.simulation_id))
-        if status.status.name == "COMPLETED":
-            break
-
-    # Add comparison data
-    _simulation_store[sph_status.simulation_id]["comparison_data"] = {
-        "overlap_area": 9.5,
+    now = datetime.datetime.utcnow().isoformat() + "Z"
+    
+    _simulation_store["sim_sph_001"] = {
+        "simulation_id": "sim_sph_001",
+        "model": ModelType.SPH.value,
+        "scenario_id": "scenario_a",
+        "breach_width": 10.0,
+        "breach_height": 2.0,
+        "status": SimulationStatus.COMPLETED.value,
+        "progress": 100.0,
+        "created_at": now,
+        "updated_at": now,
+        "request": {
+            "simulation_id": "sim_sph_001",
+            "model": ModelType.SPH.value,
+            "scenario_id": "scenario_a",
+            "breach_width": 10.0,
+            "breach_height": 2.0,
+        },
+        "comparison_data": {
+            "overlap_area": 9.5,
+        },
     }
-    _simulation_store[delft_status.simulation_id]["comparison_data"] = {
-        "overlap_area": 9.5,
+
+    _simulation_store["sim_delft3d_001"] = {
+        "simulation_id": "sim_delft3d_001",
+        "model": ModelType.DELFT3D.value,
+        "scenario_id": "scenario_b",
+        "breach_width": 15.0,
+        "breach_height": 3.0,
+        "status": SimulationStatus.COMPLETED.value,
+        "progress": 100.0,
+        "created_at": now,
+        "updated_at": now,
+        "request": {
+            "simulation_id": "sim_delft3d_001",
+            "model": ModelType.DELFT3D.value,
+            "scenario_id": "scenario_b",
+            "breach_width": 15.0,
+            "breach_height": 3.0,
+        },
+        "comparison_data": {
+            "overlap_area": 9.5,
+        },
     }

@@ -1,10 +1,14 @@
-export type ModelType = "SPH" | "Delft3D";
+export enum ModelType {
+  SPH = "SPH",
+  DELFT3D = "Delft3D",
+}
 
-export type ComparisonMetric =
-  | "flood_extent"
-  | "water_depth"
-  | "arrival_time"
-  | "computational_time";
+export enum ComparisonMetric {
+  FLOOD_EXTENT = "flood_extent",
+  WATER_DEPTH = "water_depth",
+  ARRIVAL_TIME = "arrival_time",
+  COMPUTATIONAL_TIME = "computational_time",
+}
 
 export interface Location {
   lat: number;

@@ -1,6 +1,4 @@
 import React from "react";
-import { ModelType, ComparisonMetric } from "../types";
-import { DEMO_SCENARIOS } from "../data/mockData";
 
 function ControlPanel({
   form,
@@ -63,9 +61,9 @@ function ControlPanel({
             onChange={onChange}
             disabled={isRunning}
           >
-            {DEMO_SCENARIOS.map((scenario) => (
+            {(DEMO_SCENARIOS || []).map((scenario) => (
               <option key={scenario.id} value={scenario.id}>
-                {scenario.name}
+                {scenario.label || scenario.name || scenario.id}
               </option>
             ))}
           </select>
@@ -119,31 +117,31 @@ function ControlPanel({
           disabled={isRunning}
           className="btn-run"
         >
-          {isRunning ? "Running Simulation" : "Run Simulation"}
+          {isRunning ? "Running Simulation..." : "Run Simulation"}
         </button>
       </form>
 
       <div className="scenarios-section">
         <h3>Quick Scenarios</h3>
         <div className="scenarios-grid">
-          {DEMO_SCENARIOS.map((scenario) => (
+          {(DEMO_SCENARIOS || []).map((scenario) => (
             <div
               key={scenario.id}
               className="scenario-card"
               onClick={() => {
                 onChange({ target: { name: "scenario_id", value: scenario.id } });
                 onChange({
-                  target: { name: "breach_width", value: scenario.breachWidth },
+                  target: { name: "breach_width", value: scenario.breach_width || scenario.breachWidth || 10 },
                 });
                 onChange({
-                  target: { name: "breach_height", value: scenario.breachHeight },
+                  target: { name: "breach_height", value: scenario.breach_height || scenario.breachHeight || 2 },
                 });
               }}
             >
               <div className="scenario-icon">📊</div>
               <div>
-                <strong>{scenario.name}</strong><br/>
-                {scenario.breachWidth} m width × {scenario.breachHeight} m height
+                <strong>{scenario.label || scenario.name}</strong><br/>
+                {scenario.breach_width || scenario.breachWidth || 10} m width × {scenario.breach_height || scenario.breachHeight || 2} m height
               </div>
             </div>
           ))}

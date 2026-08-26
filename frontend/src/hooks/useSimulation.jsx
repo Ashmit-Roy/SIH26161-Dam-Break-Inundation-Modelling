@@ -95,12 +95,30 @@ export function useSimulation() {
   );
 
   // Start simulation
-  const handleStartSimulation = useCallback(async (formValues) => {
+  const handleStartSimulation = useCallback(async (formValuesOrEvent) => {
+    if (formValuesOrEvent && typeof formValuesOrEvent.preventDefault === "function") {
+      formValuesOrEvent.preventDefault();
+    }
+    
     setIsRunning(true);
     setError(null);
 
+    const values = (formValuesOrEvent && !formValuesOrEvent.preventDefault) 
+      ? formValuesOrEvent 
+      : form;
+
+    const payload = {
+      ...values,
+      simulation_id: values.simulation_id?.trim() || `sim_${Date.now().toString(36)}`,
+      model: values.model || ModelType.SPH,
+      scenario_id: values.scenario_id || "scenario_a",
+      breach_width: Number(values.breach_width) || 10.0,
+      breach_height: Number(values.breach_height) || 2.0,
+      crs: values.crs || "EPSG:4326",
+    };
+
     // Validate the form
-    const validation = validateSimulationRequest(formValues as SimulationRequest);
+    const validation = validateSimulationRequest(payload);
     if (!validation.isValid) {
       setError(validation.errors.join(", "));
       setIsRunning(false);
@@ -110,21 +128,13 @@ export function useSimulation() {
     // Disable run button during simulation
     setState((prev) => ({
       ...prev,
-      current_simulation: formValues.simulation_id,
+      current_simulation: payload.simulation_id,
       simulation_progress: 0.0,
     }));
 
     try {
       // Start the simulation via API
-      const result = await runSimulation({
-        simulation_id: formValues.simulation_id,
-        model: formValues.model,
-        scenario_id: formValues.scenario_id,
-        breach_width: formValues.breach_width,
-        breach_height: formValues.breach_height,
-        simulation_time: formValues.simulation_time,
-        crs: formValues.crs,
-      });
+      const result = await runSimulation(payload);
 
       setState((prev) => ({
         ...prev,

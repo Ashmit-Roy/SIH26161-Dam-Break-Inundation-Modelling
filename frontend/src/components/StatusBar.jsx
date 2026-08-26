@@ -45,7 +45,7 @@ function StatusBar({
   startTime,
   endTime,
 }) {
-  const stageInfo = statusStages[stage] || statusStakes.idle;
+  const stageInfo = statusStages[stage] || statusStages.idle;
 
   const duration = startTime && endTime
     ? Math.round((endTime - startTime) / 1000) + " s"

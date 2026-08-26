@@ -1,68 +1,59 @@
 import React from "react";
-import { WaterDepthResult, ComparisonResult, DashboardState } from "../types";
-import { SAMPLE_WATER_DEPTH, SAMPLE_FLOOD_EXTENT, SAMPLE_COMPARISON } from "../data/mockData";
 
 function DownloadSection({
   currentResult,
   comparison,
   simulationId,
 }) {
+  const activeSimId = simulationId || currentResult?.simulation_id || "sim_sph_001";
+
   const handleDownload = (format) => {
-    if (!simulationId) {
-      alert("No simulation results to download. Run a simulation first.");
-      return;
-    }
-    alert(
-      `Download in ${format} format for ${simulationId} - ` +
-        `Real export will connect to simulation outputs when available.`
-    );
+    const apiBase = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000";
+    const url = `${apiBase}/api/simulations/${activeSimId}/download/${format.toLowerCase()}`;
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${activeSimId}.${format.toLowerCase()}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   return (
     <div className="download-section">
-      <h2>⬇️ Download Results</h2>
+      <h2>⬇️ GIS & Data Exports</h2>
 
       <div className="download-buttons">
         <button
-          onClick={() => handleDownload("GeoJSON")}
+          onClick={() => handleDownload("geojson")}
           className="btn-download"
-          title="Download GeoJSON"
-          disabled={!simulationId}
+          title="Download GeoJSON (QGIS, WebGIS)"
         >
           <span>📄</span> GeoJSON
         </button>
 
         <button
-          onClick={() => handleDownload("SHP")}
+          onClick={() => handleDownload("kml")}
           className="btn-download"
-          title="Download Shapefile"
-          disabled={!simulationId}
+          title="Download KML (Google Earth)"
         >
-          <span>🗺️</span> SHP
+          <span>📂</span> KML (Google Earth)
         </button>
 
         <button
-          onClick={() => handleDownload("KML")}
+          onClick={() => handleDownload("shp")}
           className="btn-download"
-          title="Download KML"
-          disabled={!simulationId}
+          title="Download Shapefile Metadata"
         >
-          <span>📂</span> KML
+          <span>🗺️</span> Shapefile (SHP)
         </button>
       </div>
 
       <div className="download-info">
         <p>
-          {simulationId ? (
-            `Results for simulation <strong>{simulationId}</strong>`
-          ) : (
-            "No active simulation - use mock data for preview"
-          )}
+          Active Dataset: <strong>{activeSimId}</strong> (CRS: EPSG:4326)
         </p>
         <p className="download-note">
-          Formats: GeoJSON (compatible with QGIS, ArcGIS, QGIS) ·
-          SHP (ESRI Shapefile) · KML (Google Earth, Google Maps) ·
-          All outputs reference EPSG:4326 coordinate system
+          Compatible with QGIS, ArcGIS Pro, Google Earth & Web GIS map engines.
         </p>
       </div>
     </div>
