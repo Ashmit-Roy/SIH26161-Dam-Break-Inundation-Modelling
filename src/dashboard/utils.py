@@ -1,10 +1,8 @@
 import json
-import tempfile
-from pathlib import Path
-from typing import Optional, Dict, Any, List
+from typing import Any, Dict, List
 
 import geopandas as gpd
-from shapely.geometry import shape, mapping
+from shapely.geometry import shape
 
 
 def validate_crs(crs: str) -> bool:

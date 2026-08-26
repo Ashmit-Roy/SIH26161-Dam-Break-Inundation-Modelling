@@ -1,0 +1,49 @@
+{
+  "type": "FeatureCollection",
+  "name": "SPH_DamBreak_Inundation_Extent",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:EPSG::32644"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "model": "DualSPHysics SPH",
+        "scenario": "Rishiganga Valley Sudden Release",
+        "peak_velocity_mps": 102.37,
+        "arrival_time_reni_s": 18.0,
+        "simulated_duration_s": 61
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              375780.5455,
+              3371289.991651
+            ],
+            [
+              377695.4361,
+              3371289.991651
+            ],
+            [
+              377695.4361,
+              3371908.30879
+            ],
+            [
+              375780.5455,
+              3371908.30879
+            ],
+            [
+              375780.5455,
+              3371289.991651
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

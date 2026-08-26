@@ -45,11 +45,18 @@ htmlcov/
 # Simulation outputs / generated files
 output/
 outputs/
-results/
-*.vtk
+CaseRishiganga_out/
+*.out
 *.bi4
+*.ibi4
+*.obi4
+*.vtk
+*.stl
 *.Part*
 *.Resume*
+
+# Allow SPH results contract for GIS and Dashboard teammates
+!src/simulation/sph/case_rishiganga/results/**
 
 # OS / editor
 .DS_Store

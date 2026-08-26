@@ -1,0 +1,454 @@
+{
+  "simulation_id": "SPH-RISHIGANGA-001",
+  "model": "DualSPHysics SPH (3D Particle Hydrodynamics)",
+  "scenario": "Rishiganga Valley Dam-Break / Sudden Release Prototype",
+  "spatial_reference": "EPSG:32644 (UTM Zone 44N)",
+  "study_reach": "Rishiganga River Gorge to Reni Confluence",
+  "simulation_duration_s": 61,
+  "results_summary": {
+    "peak_flood_velocity_mps": 102.37,
+    "estimated_arrival_time_reni_s": 18.0,
+    "inundation_envelope_utm": {
+      "x_min": 375780.55,
+      "x_max": 377695.44,
+      "y_min": 3371289.99,
+      "y_max": 3371908.31
+    }
+  },
+  "time_series": [
+    {
+      "time_s": 0.0,
+      "particle_count": 9450,
+      "max_velocity_mps": 0.0,
+      "mean_velocity_mps": 0.0,
+      "front_position_x_local_m": 2806.0
+    },
+    {
+      "time_s": 1.0,
+      "particle_count": 9450,
+      "max_velocity_mps": 14.56,
+      "mean_velocity_mps": 8.73,
+      "front_position_x_local_m": 2803.5
+    },
+    {
+      "time_s": 2.0,
+      "particle_count": 9450,
+      "max_velocity_mps": 36.01,
+      "mean_velocity_mps": 16.19,
+      "front_position_x_local_m": 2794.2
+    },
+    {
+      "time_s": 3.0,
+      "particle_count": 9450,
+      "max_velocity_mps": 74.23,
+      "mean_velocity_mps": 20.75,
+      "front_position_x_local_m": 2780.0
+    },
+    {
+      "time_s": 4.0,
+      "particle_count": 9450,
+      "max_velocity_mps": 76.28,
+      "mean_velocity_mps": 25.22,
+      "front_position_x_local_m": 2764.6
+    },
+    {
+      "time_s": 5.0,
+      "particle_count": 9450,
+      "max_velocity_mps": 96.06,
+      "mean_velocity_mps": 29.45,
+      "front_position_x_local_m": 2734.2
+    },
+    {
+      "time_s": 6.0,
+      "particle_count": 9450,
+      "max_velocity_mps": 72.88,
+      "mean_velocity_mps": 33.7,
+      "front_position_x_local_m": 2706.4
+    },
+    {
+      "time_s": 7.0,
+      "particle_count": 9449,
+      "max_velocity_mps": 86.81,
+      "mean_velocity_mps": 38.53,
+      "front_position_x_local_m": 2703.8
+    },
+    {
+      "time_s": 8.0,
+      "particle_count": 9449,
+      "max_velocity_mps": 85.63,
+      "mean_velocity_mps": 43.86,
+      "front_position_x_local_m": 2686.7
+    },
+    {
+      "time_s": 9.0,
+      "particle_count": 7831,
+      "max_velocity_mps": 94.1,
+      "mean_velocity_mps": 41.33,
+      "front_position_x_local_m": 2669.5
+    },
+    {
+      "time_s": 10.0,
+      "particle_count": 5987,
+      "max_velocity_mps": 92.72,
+      "mean_velocity_mps": 33.1,
+      "front_position_x_local_m": 2654.0
+    },
+    {
+      "time_s": 11.0,
+      "particle_count": 5187,
+      "max_velocity_mps": 93.64,
+      "mean_velocity_mps": 29.05,
+      "front_position_x_local_m": 2638.7
+    },
+    {
+      "time_s": 12.0,
+      "particle_count": 4613,
+      "max_velocity_mps": 102.37,
+      "mean_velocity_mps": 25.78,
+      "front_position_x_local_m": 2623.6
+    },
+    {
+      "time_s": 13.0,
+      "particle_count": 4274,
+      "max_velocity_mps": 95.58,
+      "mean_velocity_mps": 23.91,
+      "front_position_x_local_m": 2607.7
+    },
+    {
+      "time_s": 14.0,
+      "particle_count": 3990,
+      "max_velocity_mps": 95.42,
+      "mean_velocity_mps": 21.66,
+      "front_position_x_local_m": 2587.3
+    },
+    {
+      "time_s": 15.0,
+      "particle_count": 3738,
+      "max_velocity_mps": 86.2,
+      "mean_velocity_mps": 19.29,
+      "front_position_x_local_m": 2570.9
+    },
+    {
+      "time_s": 16.0,
+      "particle_count": 3596,
+      "max_velocity_mps": 91.46,
+      "mean_velocity_mps": 18.4,
+      "front_position_x_local_m": 2550.4
+    },
+    {
+      "time_s": 17.0,
+      "particle_count": 3320,
+      "max_velocity_mps": 87.95,
+      "mean_velocity_mps": 14.15,
+      "front_position_x_local_m": 2527.4
+    },
+    {
+      "time_s": 18.0,
+      "particle_count": 3259,
+      "max_velocity_mps": 89.5,
+      "mean_velocity_mps": 13.7,
+      "front_position_x_local_m": 2502.6
+    },
+    {
+      "time_s": 19.0,
+      "particle_count": 3154,
+      "max_velocity_mps": 92.58,
+      "mean_velocity_mps": 12.24,
+      "front_position_x_local_m": 2475.7
+    },
+    {
+      "time_s": 20.0,
+      "particle_count": 3040,
+      "max_velocity_mps": 95.9,
+      "mean_velocity_mps": 10.03,
+      "front_position_x_local_m": 2453.2
+    },
+    {
+      "time_s": 21.0,
+      "particle_count": 3015,
+      "max_velocity_mps": 72.89,
+      "mean_velocity_mps": 10.04,
+      "front_position_x_local_m": 2440.5
+    },
+    {
+      "time_s": 22.0,
+      "particle_count": 3015,
+      "max_velocity_mps": 81.63,
+      "mean_velocity_mps": 10.37,
+      "front_position_x_local_m": 2414.1
+    },
+    {
+      "time_s": 23.0,
+      "particle_count": 2982,
+      "max_velocity_mps": 85.59,
+      "mean_velocity_mps": 10.06,
+      "front_position_x_local_m": 2389.7
+    },
+    {
+      "time_s": 24.0,
+      "particle_count": 2957,
+      "max_velocity_mps": 79.4,
+      "mean_velocity_mps": 9.61,
+      "front_position_x_local_m": 2365.5
+    },
+    {
+      "time_s": 25.0,
+      "particle_count": 2932,
+      "max_velocity_mps": 67.56,
+      "mean_velocity_mps": 9.2,
+      "front_position_x_local_m": 2335.9
+    },
+    {
+      "time_s": 26.0,
+      "particle_count": 2932,
+      "max_velocity_mps": 56.13,
+      "mean_velocity_mps": 9.33,
+      "front_position_x_local_m": 2310.9
+    },
+    {
+      "time_s": 27.0,
+      "particle_count": 2932,
+      "max_velocity_mps": 62.76,
+      "mean_velocity_mps": 9.63,
+      "front_position_x_local_m": 2285.2
+    },
+    {
+      "time_s": 28.0,
+      "particle_count": 2932,
+      "max_velocity_mps": 71.47,
+      "mean_velocity_mps": 9.85,
+      "front_position_x_local_m": 2260.9
+    },
+    {
+      "time_s": 29.0,
+      "particle_count": 2931,
+      "max_velocity_mps": 80.81,
+      "mean_velocity_mps": 10.09,
+      "front_position_x_local_m": 2242.9
+    },
+    {
+      "time_s": 30.0,
+      "particle_count": 2888,
+      "max_velocity_mps": 80.18,
+      "mean_velocity_mps": 9.2,
+      "front_position_x_local_m": 2220.0
+    },
+    {
+      "time_s": 31.0,
+      "particle_count": 2888,
+      "max_velocity_mps": 87.83,
+      "mean_velocity_mps": 9.4,
+      "front_position_x_local_m": 2199.2
+    },
+    {
+      "time_s": 32.0,
+      "particle_count": 2872,
+      "max_velocity_mps": 51.01,
+      "mean_velocity_mps": 9.11,
+      "front_position_x_local_m": 2179.4
+    },
+    {
+      "time_s": 33.0,
+      "particle_count": 2872,
+      "max_velocity_mps": 52.39,
+      "mean_velocity_mps": 9.27,
+      "front_position_x_local_m": 2155.9
+    },
+    {
+      "time_s": 34.0,
+      "particle_count": 2872,
+      "max_velocity_mps": 59.91,
+      "mean_velocity_mps": 9.39,
+      "front_position_x_local_m": 2129.0
+    },
+    {
+      "time_s": 35.0,
+      "particle_count": 2872,
+      "max_velocity_mps": 69.46,
+      "mean_velocity_mps": 9.53,
+      "front_position_x_local_m": 2105.2
+    },
+    {
+      "time_s": 36.0,
+      "particle_count": 2872,
+      "max_velocity_mps": 79.13,
+      "mean_velocity_mps": 9.66,
+      "front_position_x_local_m": 2089.1
+    },
+    {
+      "time_s": 37.0,
+      "particle_count": 2872,
+      "max_velocity_mps": 87.25,
+      "mean_velocity_mps": 9.87,
+      "front_position_x_local_m": 2062.9
+    },
+    {
+      "time_s": 38.0,
+      "particle_count": 2831,
+      "max_velocity_mps": 40.04,
+      "mean_velocity_mps": 8.97,
+      "front_position_x_local_m": 2034.5
+    },
+    {
+      "time_s": 39.0,
+      "particle_count": 2831,
+      "max_velocity_mps": 37.27,
+      "mean_velocity_mps": 9.02,
+      "front_position_x_local_m": 2012.4
+    },
+    {
+      "time_s": 40.0,
+      "particle_count": 2831,
+      "max_velocity_mps": 42.1,
+      "mean_velocity_mps": 9.11,
+      "front_position_x_local_m": 1987.4
+    },
+    {
+      "time_s": 41.0,
+      "particle_count": 2831,
+      "max_velocity_mps": 43.81,
+      "mean_velocity_mps": 9.19,
+      "front_position_x_local_m": 1964.9
+    },
+    {
+      "time_s": 42.0,
+      "particle_count": 2831,
+      "max_velocity_mps": 42.93,
+      "mean_velocity_mps": 9.34,
+      "front_position_x_local_m": 1949.2
+    },
+    {
+      "time_s": 43.0,
+      "particle_count": 2831,
+      "max_velocity_mps": 40.9,
+      "mean_velocity_mps": 9.44,
+      "front_position_x_local_m": 1940.6
+    },
+    {
+      "time_s": 44.0,
+      "particle_count": 2831,
+      "max_velocity_mps": 44.47,
+      "mean_velocity_mps": 9.57,
+      "front_position_x_local_m": 1934.9
+    },
+    {
+      "time_s": 45.0,
+      "particle_count": 2831,
+      "max_velocity_mps": 52.59,
+      "mean_velocity_mps": 9.66,
+      "front_position_x_local_m": 1929.9
+    },
+    {
+      "time_s": 46.0,
+      "particle_count": 2831,
+      "max_velocity_mps": 61.77,
+      "mean_velocity_mps": 9.77,
+      "front_position_x_local_m": 1923.5
+    },
+    {
+      "time_s": 47.0,
+      "particle_count": 2831,
+      "max_velocity_mps": 70.96,
+      "mean_velocity_mps": 9.91,
+      "front_position_x_local_m": 1908.8
+    },
+    {
+      "time_s": 48.0,
+      "particle_count": 2831,
+      "max_velocity_mps": 80.37,
+      "mean_velocity_mps": 10.07,
+      "front_position_x_local_m": 1894.3
+    },
+    {
+      "time_s": 49.0,
+      "particle_count": 2806,
+      "max_velocity_mps": 38.62,
+      "mean_velocity_mps": 9.56,
+      "front_position_x_local_m": 1877.3
+    },
+    {
+      "time_s": 50.0,
+      "particle_count": 2806,
+      "max_velocity_mps": 38.24,
+      "mean_velocity_mps": 9.65,
+      "front_position_x_local_m": 1858.7
+    },
+    {
+      "time_s": 51.0,
+      "particle_count": 2806,
+      "max_velocity_mps": 41.99,
+      "mean_velocity_mps": 9.66,
+      "front_position_x_local_m": 1838.8
+    },
+    {
+      "time_s": 52.0,
+      "particle_count": 2806,
+      "max_velocity_mps": 38.16,
+      "mean_velocity_mps": 9.74,
+      "front_position_x_local_m": 1820.2
+    },
+    {
+      "time_s": 53.0,
+      "particle_count": 2806,
+      "max_velocity_mps": 44.04,
+      "mean_velocity_mps": 9.79,
+      "front_position_x_local_m": 1801.8
+    },
+    {
+      "time_s": 54.0,
+      "particle_count": 2806,
+      "max_velocity_mps": 42.52,
+      "mean_velocity_mps": 9.87,
+      "front_position_x_local_m": 1788.8
+    },
+    {
+      "time_s": 55.0,
+      "particle_count": 2806,
+      "max_velocity_mps": 40.62,
+      "mean_velocity_mps": 9.89,
+      "front_position_x_local_m": 1775.2
+    },
+    {
+      "time_s": 56.0,
+      "particle_count": 2806,
+      "max_velocity_mps": 40.02,
+      "mean_velocity_mps": 9.92,
+      "front_position_x_local_m": 1764.6
+    },
+    {
+      "time_s": 57.0,
+      "particle_count": 2806,
+      "max_velocity_mps": 40.23,
+      "mean_velocity_mps": 9.89,
+      "front_position_x_local_m": 1756.0
+    },
+    {
+      "time_s": 58.0,
+      "particle_count": 2806,
+      "max_velocity_mps": 36.59,
+      "mean_velocity_mps": 9.87,
+      "front_position_x_local_m": 1746.9
+    },
+    {
+      "time_s": 59.0,
+      "particle_count": 2806,
+      "max_velocity_mps": 42.97,
+      "mean_velocity_mps": 9.9,
+      "front_position_x_local_m": 1726.6
+    },
+    {
+      "time_s": 60.0,
+      "particle_count": 2806,
+      "max_velocity_mps": 38.13,
+      "mean_velocity_mps": 9.93,
+      "front_position_x_local_m": 1715.0
+    },
+    {
+      "time_s": 61.0,
+      "particle_count": 61,
+      "max_velocity_mps": 0.0,
+      "mean_velocity_mps": 0.0,
+      "front_position_x_local_m": 0.0
+    }
+  ]
+}
