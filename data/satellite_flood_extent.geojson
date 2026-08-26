@@ -1,6 +1,6 @@
 {
   "type": "FeatureCollection",
-  "name": "satellite_detected_flood_extent",
+  "name": "rishiganga_satellite_flood_extent",
   "crs": {
     "type": "name",
     "properties": {
@@ -11,35 +11,37 @@
     {
       "type": "Feature",
       "properties": {
-        "event": "Post-Dam-Break-Inundation",
+        "event": "Rishi Ganga & Dhauliganga River Disaster",
+        "event_date": "2021-02-07",
+        "location": "Chamoli, Uttarakhand",
         "satellite": "Sentinel-1 IW GRD",
         "detection_method": "SAR Backscatter Threshold + RF ML Classifier",
-        "flooded_area_ha": 24.57,
-        "flooded_area_km2": 0.2457
+        "flooded_area_ha": 1.34,
+        "flooded_area_km2": 0.0134
       },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
           [
             [
-              75.85,
-              31.25
+              79.55,
+              30.45
             ],
             [
-              76.15,
-              31.25
+              79.78,
+              30.45
             ],
             [
-              76.1,
-              31.55
+              79.75,
+              30.62
             ],
             [
-              75.8,
-              31.5
+              79.58,
+              30.6
             ],
             [
-              75.85,
-              31.25
+              79.55,
+              30.45
             ]
           ]
         ]
