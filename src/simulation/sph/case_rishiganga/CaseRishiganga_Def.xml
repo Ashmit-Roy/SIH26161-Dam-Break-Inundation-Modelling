@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<case>
+    <casedef>
+        <constantsdef>
+            <gravity x="0" y="0" z="-9.81" comment="Gravitational acceleration" units_comment="m/s^2" />
+            <rhop0 value="1000" comment="Reference density of the fluid" units_comment="kg/m^3" />
+            <rhopgradient value="2" comment="Initial density gradient" />
+            <hswl value="0" auto="true" comment="Maximum still water level" units_comment="metres (m)" />
+            <gamma value="7" comment="Polytropic constant for water" />
+            <speedsystem value="0" auto="true" comment="Maximum system speed" />
+            <coefsound value="20" comment="Coefficient to multiply speedsystem" />
+            <speedsound value="0" auto="true" comment="Speed of sound" />
+            <coefh value="1.2" comment="Coefficient to calculate smoothing length" />
+            <cflnumber value="0.2" comment="CFL coefficient" />
+        </constantsdef>
+        <mkconfig boundcount="240" fluidcount="9"/>
+        <geometry>
+            <definition dp="10.0" units_comment="metres (m)">
+                <pointmin x="-50" y="-50" z="-20" />
+                <pointmax x="3750" y="2350" z="800" />
+            </definition>
+            <commands>
+                <mainlist>
+                    <!-- BOUNDARY MK 0: Natural Rishiganga Mountain Canyon Terrain -->
+                    <setshapemode>actual | bound</setshapemode>
+                    <setdrawmode mode="full" />
+                    <setmkbound mk="0" />
+                    <drawfilestl file="rishiganga_terrain.stl">
+                        <drawscale x="1.0" y="1.0" z="1.0" />
+                        <drawmove x="0.0" y="0.0" z="0.0" />
+                    </drawfilestl>
+                    
+                    <!-- BOUNDARY MK 1: Concrete Dam Structure with Breach Opening -->
+                    <!-- Left Dam Flank/Abutment -->
+                    <setmkbound mk="1" />
+                    <drawbox>
+                        <boxfill>solid</boxfill>
+                        <point x="2760" y="80" z="360" />
+                        <size x="30" y="120" z="60" />
+                    </drawbox>
+                    <!-- Right Dam Flank/Abutment (Leaving a 120m breach gap in the middle) -->
+                    <drawbox>
+                        <boxfill>solid</boxfill>
+                        <point x="2760" y="280" z="360" />
+                        <size x="30" y="140" z="60" />
+                    </drawbox>
+                    
+                    <!-- BOUNDARY MK 2: Downstream Reni Bridge / Critical Infrastructure -->
+                    <setmkbound mk="2" />
+                    <!-- Bridge Deck across confluence -->
+                    <drawbox>
+                        <boxfill>solid</boxfill>
+                        <point x="120" y="2200" z="25" />
+                        <size x="150" y="25" z="8" />
+                    </drawbox>
+                    <!-- Bridge Left Pier -->
+                    <drawbox>
+                        <boxfill>solid</boxfill>
+                        <point x="140" y="2205" z="0" />
+                        <size x="20" y="15" z="25" />
+                    </drawbox>
+                    <!-- Bridge Right Pier -->
+                    <drawbox>
+                        <boxfill>solid</boxfill>
+                        <point x="220" y="2205" z="0" />
+                        <size x="20" y="15" z="25" />
+                    </drawbox>
+                    
+                    <!-- FLUID MK 0: Impounded Water Reservoir behind the Dam (Sudden-Release / Dam Break) -->
+                    <setmkfluid mk="0" />
+                    <drawbox>
+                        <boxfill>solid</boxfill>
+                        <point x="2800" y="100" z="365" />
+                        <size x="750" y="350" z="45" />
+                    </drawbox>
+                    
+                    <shapeout file="" />
+                </mainlist>
+            </commands>
+        </geometry>
+    </casedef>
+    <execution>
+        <parameters>
+            <parameter key="SavePosDouble" value="0" comment="Saves particle position using double precision" />
+            <parameter key="StepAlgorithm" value="1" comment="Step Algorithm 1:Verlet, 2:Symplectic" />
+            <parameter key="VerletSteps" value="40" comment="Verlet steps" />
+            <parameter key="Kernel" value="2" comment="Interaction Kernel 1:Cubic Spline, 2:Wendland" />
+            <parameter key="ViscoTreatment" value="1" comment="Viscosity formulation 1:Artificial" />
+            <parameter key="Visco" value="0.05" comment="Artificial viscosity alpha coefficient" />
+            <parameter key="ViscoBoundFactor" value="1" comment="Multiply viscosity with boundary" />
+            <parameter key="DensityDT" value="2" comment="DDT formulation" />
+            <parameter key="DensityDTvalue" value="0.1" comment="DDT value" />
+            <parameter key="Shifting" value="0" comment="Shifting mode" />
+            <parameter key="RigidAlgorithm" value="1" comment="Rigid algorithm" />
+            <parameter key="FtPause" value="0.0" comment="Warmup pause" units_comment="seconds" />
+            <parameter key="CoefDtMin" value="0.05" comment="Minimum dt coefficient" />
+            <parameter key="DtIni" value="0" comment="Initial dt" units_comment="seconds" />
+            <parameter key="DtMin" value="0" comment="Minimum dt" units_comment="seconds" />
+            <parameter key="TimeMax" value="60.0" comment="Simulation time (seconds)" units_comment="seconds" />
+            <parameter key="TimeOut" value="1.0" comment="Time out data frequency (seconds)" units_comment="seconds" />
+            <parameter key="PartsOutMax" value="1" comment="Max fluid particles allowed out" />
+            <parameter key="RhopOutMin" value="700" comment="Minimum density" units_comment="kg/m^3" />
+            <parameter key="RhopOutMax" value="1300" comment="Maximum density" units_comment="kg/m^3" />
+            <simulationdomain comment="Defines domain of simulation">
+                <posmin x="default" y="default" z="default" />
+                <posmax x="default" y="default" z="default + 20%" />
+            </simulationdomain>
+        </parameters>
+    </execution>
+</case>

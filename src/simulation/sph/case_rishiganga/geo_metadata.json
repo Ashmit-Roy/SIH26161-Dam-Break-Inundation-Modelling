@@ -1,0 +1,19 @@
+{
+  "reach_name": "Rishiganga - Reni Confluence",
+  "crs": "EPSG:32644 (WGS 84 / UTM zone 44N)",
+  "dem_resolution_m": 2.0,
+  "mesh_resolution_m": 8.0,
+  "utm_origin": {
+    "utm_x_min": 374065.5572,
+    "utm_y_min": 3371264.4593,
+    "elevation_z_offset_m": 1908.4771728515625
+  },
+  "domain_size_m": {
+    "x_length": 3656.0,
+    "y_width": 2240.0,
+    "z_height": 1869.9036865234375
+  },
+  "stl_file": "rishiganga_terrain.stl",
+  "vertices_count": 127960,
+  "triangles_count": 254448
+}
