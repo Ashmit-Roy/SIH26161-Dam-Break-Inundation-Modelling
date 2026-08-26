@@ -1,0 +1,317 @@
+<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+<qgis version="3.34.0-Prizren" projectname="SIH26161 - Rishi Ganga Dam Break Inundation Modelling">
+  <homePath path=".."/>
+  <title>SIH26161 - Rishi Ganga Dam Break Inundation Study</title>
+  <projectCrs>
+    <spatialrefsys nativeFormat="Wkt">
+      <wkt>PROJCRS["WGS 84 / UTM zone 44N",BASEGEOGCRS["WGS 84",DATUM["World Geodetic System 1984",ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["UTM zone 44N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",81,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["Engineering survey, topographic mapping."],AREA["Between 78°E and 84°E, northern hemisphere."],BBOX[0,78,84,84]],ID["EPSG",32644]]</wkt>
+      <proj4>+proj=utm +zone=44 +datum=WGS84 +units=m +no_defs</proj4>
+      <srsid>3128</srsid>
+      <srid>32644</srid>
+      <authid>EPSG:32644</authid>
+      <description>WGS 84 / UTM zone 44N</description>
+      <projectionacronym>utm</projectionacronym>
+      <ellipsoidacronym>EPSG:7030</ellipsoidacronym>
+      <geographicflag>false</geographicflag>
+    </spatialrefsys>
+  </projectCrs>
+  
+  <layer-tree-group>
+    <customproperties>
+      <Option/>
+    </customproperties>
+    <custom-order enabled="0"/>
+    
+    <layer-tree-group name="Dam Break Simulation Results" expanded="1" checked="Qt::Checked">
+      <layer-tree-layer name="Dam Locations" id="dam_locations_d9e00e64" checked="Qt::Checked"/>
+      <layer-tree-layer name="Critical Infrastructure" id="critical_infra_2c69f582" checked="Qt::Checked"/>
+      <layer-tree-layer name="Flood Inundation Extent" id="flood_extent_706a7f11" checked="Qt::Checked"/>
+      <layer-tree-layer name="Flood Hazard Zones" id="hazard_zones_ba6264bf" checked="Qt::Unchecked"/>
+      <layer-tree-layer name="Peak Flood Depth (m)" id="flood_depth_b1dd7511" checked="Qt::Checked"/>
+      <layer-tree-layer name="Max Flow Velocity (m/s)" id="flow_velocity_63cbc1b5" checked="Qt::Unchecked"/>
+    </layer-tree-group>
+    
+    <layer-tree-group name="Hydrology &amp; Basework" expanded="1" checked="Qt::Checked">
+      <layer-tree-layer name="River Reach Centerline" id="river_reach_05f88116" checked="Qt::Checked"/>
+      <layer-tree-layer name="Study Area Basin Boundary" id="study_boundary_94c2f820" checked="Qt::Checked"/>
+    </layer-tree-group>
+    
+    <layer-tree-group name="Terrain &amp; Elevation" expanded="1" checked="Qt::Checked">
+      <layer-tree-layer name="Terrain Hillshade" id="hillshade_8a205883" checked="Qt::Checked"/>
+      <layer-tree-layer name="Rishi Ganga DEM (30m)" id="dem_d9a735d6" checked="Qt::Unchecked"/>
+    </layer-tree-group>
+  </layer-tree-group>
+  
+  <projectlayers>
+    <!-- Vector: Dam Locations -->
+    <maplayer type="vector" id="dam_locations_d9e00e64" name="Dam Locations" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+      <datasource>./data/vector/dam_locations.geojson</datasource>
+      <layername>Dam Locations</layername>
+      <srs>
+        <spatialrefsys nativeFormat="Wkt">
+          <authid>EPSG:4326</authid>
+          <description>WGS 84</description>
+        </spatialrefsys>
+      </srs>
+      <renderer-v2 type="singleSymbol" symbollevels="0">
+        <symbols>
+          <symbol type="marker" name="0" alpha="1" clip_to_extent="1">
+            <layer class="SimpleMarker" enabled="1" locked="0">
+              <Option type="Map">
+                <Option name="color" type="QString" value="230,20,20,255"/>
+                <Option name="outline_color" type="QString" value="255,255,255,255"/>
+                <Option name="outline_width" type="QString" value="0.8"/>
+                <Option name="size" type="QString" value="5.5"/>
+                <Option name="name" type="QString" value="diamond"/>
+              </Option>
+            </layer>
+          </symbol>
+        </symbols>
+      </renderer-v2>
+    </maplayer>
+    
+    <!-- Vector: Critical Infrastructure -->
+    <maplayer type="vector" id="critical_infra_2c69f582" name="Critical Infrastructure" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+      <datasource>./data/vector/critical_infrastructure.geojson</datasource>
+      <layername>Critical Infrastructure</layername>
+      <srs>
+        <spatialrefsys nativeFormat="Wkt">
+          <authid>EPSG:4326</authid>
+          <description>WGS 84</description>
+        </spatialrefsys>
+      </srs>
+      <renderer-v2 type="singleSymbol" symbollevels="0">
+        <symbols>
+          <symbol type="marker" name="0" alpha="1" clip_to_extent="1">
+            <layer class="SimpleMarker" enabled="1" locked="0">
+              <Option type="Map">
+                <Option name="color" type="QString" value="255,140,0,255"/>
+                <Option name="outline_color" type="QString" value="0,0,0,255"/>
+                <Option name="outline_width" type="QString" value="0.5"/>
+                <Option name="size" type="QString" value="4.0"/>
+                <Option name="name" type="QString" value="triangle"/>
+              </Option>
+            </layer>
+          </symbol>
+        </symbols>
+      </renderer-v2>
+    </maplayer>
+
+    <!-- Vector: River Reach -->
+    <maplayer type="vector" id="river_reach_05f88116" name="River Reach Centerline" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+      <datasource>./data/vector/river_centerline.geojson</datasource>
+      <layername>River Reach Centerline</layername>
+      <srs>
+        <spatialrefsys nativeFormat="Wkt">
+          <authid>EPSG:4326</authid>
+          <description>WGS 84</description>
+        </spatialrefsys>
+      </srs>
+      <renderer-v2 type="singleSymbol" symbollevels="0">
+        <symbols>
+          <symbol type="line" name="0" alpha="1" clip_to_extent="1">
+            <layer class="SimpleLine" enabled="1" locked="0">
+              <Option type="Map">
+                <Option name="line_color" type="QString" value="20,100,220,255"/>
+                <Option name="line_width" type="QString" value="1.2"/>
+              </Option>
+            </layer>
+          </symbol>
+        </symbols>
+      </renderer-v2>
+    </maplayer>
+
+    <!-- Vector: Basin Boundary -->
+    <maplayer type="vector" id="study_boundary_94c2f820" name="Study Area Basin Boundary" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+      <datasource>./data/vector/study_area_boundary.geojson</datasource>
+      <layername>Study Area Basin Boundary</layername>
+      <srs>
+        <spatialrefsys nativeFormat="Wkt">
+          <authid>EPSG:4326</authid>
+          <description>WGS 84</description>
+        </spatialrefsys>
+      </srs>
+      <renderer-v2 type="singleSymbol" symbollevels="0">
+        <symbols>
+          <symbol type="fill" name="0" alpha="1" clip_to_extent="1">
+            <layer class="SimpleLine" enabled="1" locked="0">
+              <Option type="Map">
+                <Option name="line_color" type="QString" value="40,40,40,255"/>
+                <Option name="line_style" type="QString" value="dash"/>
+                <Option name="line_width" type="QString" value="0.8"/>
+              </Option>
+            </layer>
+          </symbol>
+        </symbols>
+      </renderer-v2>
+    </maplayer>
+
+    <!-- Vector: Flood Extent -->
+    <maplayer type="vector" id="flood_extent_706a7f11" name="Flood Inundation Extent" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+      <datasource>./outputs/flood_extent.geojson</datasource>
+      <layername>Flood Inundation Extent</layername>
+      <srs>
+        <spatialrefsys nativeFormat="Wkt">
+          <authid>EPSG:4326</authid>
+          <description>WGS 84</description>
+        </spatialrefsys>
+      </srs>
+      <renderer-v2 type="singleSymbol" symbollevels="0">
+        <symbols>
+          <symbol type="fill" name="0" alpha="0.65" clip_to_extent="1">
+            <layer class="SimpleFill" enabled="1" locked="0">
+              <Option type="Map">
+                <Option name="color" type="QString" value="0,170,255,165"/>
+                <Option name="outline_color" type="QString" value="0,90,190,255"/>
+                <Option name="outline_width" type="QString" value="0.5"/>
+              </Option>
+            </layer>
+          </symbol>
+        </symbols>
+      </renderer-v2>
+    </maplayer>
+
+    <!-- Vector: Hazard Zones -->
+    <maplayer type="vector" id="hazard_zones_ba6264bf" name="Flood Hazard Zones" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+      <datasource>./outputs/hazard_zones.geojson</datasource>
+      <layername>Flood Hazard Zones</layername>
+      <srs>
+        <spatialrefsys nativeFormat="Wkt">
+          <authid>EPSG:4326</authid>
+          <description>WGS 84</description>
+        </spatialrefsys>
+      </srs>
+      <renderer-v2 type="categorizedSymbol" attr="hazard_code" symbollevels="0">
+        <categories>
+          <category value="1" label="Low Hazard (Caution)" symbol="0"/>
+          <category value="2" label="Moderate Hazard" symbol="1"/>
+          <category value="3" label="Significant Hazard" symbol="2"/>
+          <category value="4" label="Extreme Hazard" symbol="3"/>
+        </categories>
+        <symbols>
+          <symbol type="fill" name="0" alpha="0.6"><layer class="SimpleFill"><Option type="Map"><Option name="color" type="QString" value="255,255,100,160"/><Option name="outline_color" type="QString" value="180,180,0,255"/></Option></layer></symbol>
+          <symbol type="fill" name="1" alpha="0.6"><layer class="SimpleFill"><Option type="Map"><Option name="color" type="QString" value="255,165,0,160"/><Option name="outline_color" type="QString" value="200,100,0,255"/></Option></layer></symbol>
+          <symbol type="fill" name="2" alpha="0.6"><layer class="SimpleFill"><Option type="Map"><Option name="color" type="QString" value="255,50,50,160"/><Option name="outline_color" type="QString" value="180,0,0,255"/></Option></layer></symbol>
+          <symbol type="fill" name="3" alpha="0.7"><layer class="SimpleFill"><Option type="Map"><Option name="color" type="QString" value="150,0,100,180"/><Option name="outline_color" type="QString" value="90,0,50,255"/></Option></layer></symbol>
+        </symbols>
+      </renderer-v2>
+    </maplayer>
+
+    <!-- Raster: Flood Depth -->
+    <maplayer type="raster" id="flood_depth_b1dd7511" name="Peak Flood Depth (m)" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories" autoRefreshMode="Disabled">
+      <datasource>./outputs/flood_depth.tif</datasource>
+      <layername>Peak Flood Depth (m)</layername>
+      <srs>
+        <spatialrefsys nativeFormat="Wkt">
+          <authid>EPSG:32644</authid>
+          <description>WGS 84 / UTM zone 44N</description>
+        </spatialrefsys>
+      </srs>
+      <pipe-data>
+        <rasterrenderer type="singlebandpseudocolor" band="1" opacity="0.8" classificationMin="0.2" classificationMax="15.0">
+          <rastershader>
+            <colorrampshader colorRampType="INTERPOLATED" clip="0">
+              <item color="#e0f3f8" label="0.2 m" value="0.2"/>
+              <item color="#91bfdb" label="3.0 m" value="3.0"/>
+              <item color="#4575b4" label="8.0 m" value="8.0"/>
+              <item color="#313695" label="15.0+ m" value="15.0"/>
+            </colorrampshader>
+          </rastershader>
+        </rasterrenderer>
+      </pipe-data>
+    </maplayer>
+
+    <!-- Raster: Flow Velocity -->
+    <maplayer type="raster" id="flow_velocity_63cbc1b5" name="Max Flow Velocity (m/s)" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories" autoRefreshMode="Disabled">
+      <datasource>./outputs/flow_velocity.tif</datasource>
+      <layername>Max Flow Velocity (m/s)</layername>
+      <srs>
+        <spatialrefsys nativeFormat="Wkt">
+          <authid>EPSG:32644</authid>
+          <description>WGS 84 / UTM zone 44N</description>
+        </spatialrefsys>
+      </srs>
+      <pipe-data>
+        <rasterrenderer type="singlebandpseudocolor" band="1" opacity="0.75" classificationMin="0.5" classificationMax="16.0">
+          <rastershader>
+            <colorrampshader colorRampType="INTERPOLATED" clip="0">
+              <item color="#fee08b" label="0.5 m/s" value="0.5"/>
+              <item color="#fdae61" label="5.0 m/s" value="5.0"/>
+              <item color="#f46d43" label="10.0 m/s" value="10.0"/>
+              <item color="#d73027" label="16.0+ m/s" value="16.0"/>
+            </colorrampshader>
+          </rastershader>
+        </rasterrenderer>
+      </pipe-data>
+    </maplayer>
+
+    <!-- Raster: Hillshade -->
+    <maplayer type="raster" id="hillshade_8a205883" name="Terrain Hillshade" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories" autoRefreshMode="Disabled">
+      <datasource>./outputs/terrain_hillshade.tif</datasource>
+      <layername>Terrain Hillshade</layername>
+      <srs>
+        <spatialrefsys nativeFormat="Wkt">
+          <authid>EPSG:32644</authid>
+          <description>WGS 84 / UTM zone 44N</description>
+        </spatialrefsys>
+      </srs>
+      <pipe-data>
+        <rasterrenderer type="singlebandgray" grayMode="0" band="1" opacity="0.85">
+          <contrastEnhancement>
+            <minValue>0</minValue>
+            <maxValue>255</maxValue>
+            <algorithm>StretchToMinimumMaximum</algorithm>
+          </contrastEnhancement>
+        </rasterrenderer>
+      </pipe-data>
+    </maplayer>
+
+    <!-- Raster: DEM -->
+    <maplayer type="raster" id="dem_d9a735d6" name="Rishi Ganga DEM (30m)" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories" autoRefreshMode="Disabled">
+      <datasource>./data/dem/rishi_ganga_dem_30m.tif</datasource>
+      <layername>Rishi Ganga DEM (30m)</layername>
+      <srs>
+        <spatialrefsys nativeFormat="Wkt">
+          <authid>EPSG:32644</authid>
+          <description>WGS 84 / UTM zone 44N</description>
+        </spatialrefsys>
+      </srs>
+      <pipe-data>
+        <rasterrenderer type="singlebandpseudocolor" band="1" opacity="1.0" classificationMin="1400" classificationMax="3800">
+          <rastershader>
+            <colorrampshader colorRampType="INTERPOLATED" clip="0">
+              <item color="#1a9641" label="1400 m" value="1400"/>
+              <item color="#a6d96a" label="2000 m" value="2000"/>
+              <item color="#ffffbf" label="2600 m" value="2600"/>
+              <item color="#fdae61" label="3200 m" value="3200"/>
+              <item color="#d7191c" label="3800 m" value="3800"/>
+            </colorrampshader>
+          </rastershader>
+        </rasterrenderer>
+      </pipe-data>
+    </maplayer>
+  </projectlayers>
+  
+  <layerorder>
+    <layer id="dam_locations_d9e00e64"/>
+    <layer id="critical_infra_2c69f582"/>
+    <layer id="river_reach_05f88116"/>
+    <layer id="study_boundary_94c2f820"/>
+    <layer id="flood_extent_706a7f11"/>
+    <layer id="hazard_zones_ba6264bf"/>
+    <layer id="flood_depth_b1dd7511"/>
+    <layer id="flow_velocity_63cbc1b5"/>
+    <layer id="hillshade_8a205883"/>
+    <layer id="dem_d9a735d6"/>
+  </layerorder>
+  
+  <properties>
+    <Measurement>
+      <DistanceUnits type="QString">meters</DistanceUnits>
+      <AreaUnits type="QString">m2</AreaUnits>
+    </Measurement>
+    <Paths>
+      <Absolute type="bool">false</Absolute>
+    </Paths>
+  </properties>
+</qgis>

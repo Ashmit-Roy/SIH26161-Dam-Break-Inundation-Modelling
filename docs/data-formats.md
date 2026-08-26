@@ -39,19 +39,59 @@
 
 | Property | Value |
 |---|---|
-| Format | TBD (GeoTIFF expected) |
-| Units | metres |
-| CRS | TBD |
+| File Path | `outputs/flood_depth.tif` |
+| Format | Cloud-Optimized GeoTIFF (`GTiff`) |
+| Data Type | `float32` |
+| Units | Metres (`m`) above local terrain |
+| CRS | `EPSG:32644` (WGS 84 / UTM Zone 44N) |
+| Resolution | 30.0 m × 30.0 m |
+| NoData Value | `-9999.0` |
 
-### 3.2 Flood Extent Polygons
+### 3.2 Flood Velocity Raster
 
 | Property | Value |
 |---|---|
-| Formats | `.shp`, `.kml`, GeoJSON where appropriate |
+| File Path | `outputs/flow_velocity.tif` |
+| Format | Cloud-Optimized GeoTIFF (`GTiff`) |
+| Data Type | `float32` |
+| Units | Metres per second (`m/s`) |
+| CRS | `EPSG:32644` (WGS 84 / UTM Zone 44N) |
+| Resolution | 30.0 m × 30.0 m |
+| NoData Value | `-9999.0` |
 
-### 3.3 Common Simulation Output
+### 3.3 Flood Hazard Rating Raster
 
-Normalized result representation consumed by GIS/Dashboard — see [api-contract.md](api-contract.md).
+| Property | Value |
+|---|---|
+| File Path | `outputs/hazard_index.tif` |
+| Format | GeoTIFF (`GTiff`) |
+| Formulation | DEFRA Standard: $HR = d \times (v + 0.5) + DF$ |
+| CRS | `EPSG:32644` (WGS 84 / UTM Zone 44N) |
+
+### 3.4 Flood Extent Polygons
+
+| Property | Value |
+|---|---|
+| File Paths | `outputs/flood_extent.geojson` (Web) / `outputs/flood_extent.shp` (GIS) / `outputs/flood_extent.gpkg` |
+| Formats | GeoJSON (RFC 7946), ESRI Shapefile, OGC GeoPackage |
+| Web CRS | `EPSG:4326` (WGS 84 geographic coordinates) |
+| Projected CRS | `EPSG:32644` (for Shapefile and GeoPackage) |
+| Schema Fields | `scenario` (string), `flooded` (int), `min_depth_m` (float), `flooded_area_ha` (float) |
+
+### 3.5 Flood Hazard Zones Polygons
+
+| Property | Value |
+|---|---|
+| File Paths | `outputs/hazard_zones.geojson` (Web) / `outputs/hazard_zones.gpkg` |
+| Format | GeoJSON, GeoPackage |
+| Classification | 1: Low Hazard, 2: Moderate Hazard, 3: Significant Hazard, 4: Extreme Hazard |
+
+### 3.6 Summary Metadata
+
+| Property | Value |
+|---|---|
+| File Path | `outputs/metadata.json` |
+| Contents | Flood area (ha), peak depth, peak velocity, wave arrival time, and infrastructure vulnerability status |
 
 ## 4. Validation Rules
 

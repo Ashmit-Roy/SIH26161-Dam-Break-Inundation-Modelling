@@ -74,8 +74,6 @@ def calculate_flooded_area(geojson_path: str) -> float:
     if flood_gdf.crs is None:
         raise ValueError("Flood extent has no CRS.")
 
-    projected = flood_gdf.to_crs(
-        flood_gdf.estimate_utm_crs()
-    )
+    projected = flood_gdf.to_crs(flood_gdf.estimate_utm_crs())
 
     return float(projected.geometry.area.sum())
