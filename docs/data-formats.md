@@ -93,6 +93,25 @@
 | File Path | `outputs/metadata.json` |
 | Contents | Flood area (ha), peak depth, peak velocity, wave arrival time, and infrastructure vulnerability status |
 
+### 3.7 SPH vs Satellite Hazard Overlay Layers
+
+| Property | Value |
+|---|---|
+| File Paths | `outputs/sph_satellite_overlay.geojson` (Web) / `outputs/sph_satellite_overlay.gpkg` / `outputs/sph_satellite_overlay.shp` / `outputs/sph_satellite_overlay.kml` |
+| Formats | GeoJSON (RFC 7946), OGC GeoPackage, ESRI Shapefile, OGC KML |
+| Web / KML CRS | `EPSG:4326` (WGS 84 geographic coordinates) |
+| Projected CRS | `EPSG:32644` (WGS 84 / UTM Zone 44N) |
+| Categories | 1: Agreement (Simulated & Observed), 2: SPH Simulated Only, 3: Satellite Observed Only |
+| Schema Fields | `category_code` (int), `category` (string), `description` (string), `fill_color` (hex), `stroke_color` (hex), `area_ha` (float), `area_sqm` (float) |
+
+### 3.8 SPH vs Satellite Validation Report
+
+| Property | Value |
+|---|---|
+| File Path | `outputs/sph_satellite_validation_report.json` |
+| Metrics | IoU (Jaccard Index), Dice / F1 Score, Critical Success Index (CSI), Hit Rate / Sensitivity (TPR), False Alarm Ratio (FAR), SPH Area (ha), Satellite Area (ha), Agreement Area (ha) |
+
 ## 4. Validation Rules
 
 All ingested files must be validated for: existence, readable metadata, CRS presence, value ranges, and missing-data handling. Numerical failures must not be silently ignored (AGENTS.md §35).
+

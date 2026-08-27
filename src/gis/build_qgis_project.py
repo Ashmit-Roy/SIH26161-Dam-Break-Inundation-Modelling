@@ -22,6 +22,7 @@ def build_qgis_project(workspace_root: Path) -> Path:
     # Layer UUIDs
     id_dams = f"dam_locations_{uuid.uuid4().hex[:8]}"
     id_infra = f"critical_infra_{uuid.uuid4().hex[:8]}"
+    id_sph_sat = f"sph_sat_overlay_{uuid.uuid4().hex[:8]}"
     id_river = f"river_reach_{uuid.uuid4().hex[:8]}"
     id_boundary = f"study_boundary_{uuid.uuid4().hex[:8]}"
     id_flood_ext = f"flood_extent_{uuid.uuid4().hex[:8]}"
@@ -58,6 +59,7 @@ def build_qgis_project(workspace_root: Path) -> Path:
     <layer-tree-group name="Dam Break Simulation Results" expanded="1" checked="Qt::Checked">
       <layer-tree-layer name="Dam Locations" id="{id_dams}" checked="Qt::Checked"/>
       <layer-tree-layer name="Critical Infrastructure" id="{id_infra}" checked="Qt::Checked"/>
+      <layer-tree-layer name="SPH vs Satellite Hazard Overlay" id="{id_sph_sat}" checked="Qt::Checked"/>
       <layer-tree-layer name="Flood Inundation Extent" id="{id_flood_ext}" checked="Qt::Checked"/>
       <layer-tree-layer name="Flood Hazard Zones" id="{id_hazard}" checked="Qt::Unchecked"/>
       <layer-tree-layer name="Peak Flood Depth (m)" id="{id_depth}" checked="Qt::Checked"/>
@@ -175,6 +177,30 @@ def build_qgis_project(workspace_root: Path) -> Path:
               </Option>
             </layer>
           </symbol>
+        </symbols>
+      </renderer-v2>
+    </maplayer>
+
+    <!-- Vector: SPH vs Satellite Hazard Overlay -->
+    <maplayer type="vector" id="{id_sph_sat}" name="SPH vs Satellite Hazard Overlay" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+      <datasource>./outputs/sph_satellite_overlay.geojson</datasource>
+      <layername>SPH vs Satellite Hazard Overlay</layername>
+      <srs>
+        <spatialrefsys nativeFormat="Wkt">
+          <authid>EPSG:4326</authid>
+          <description>WGS 84</description>
+        </spatialrefsys>
+      </srs>
+      <renderer-v2 type="categorizedSymbol" attr="category_code" symbollevels="0">
+        <categories>
+          <category value="1" label="Agreement (Simulated &amp; Observed)" symbol="0"/>
+          <category value="2" label="SPH Simulated Only" symbol="1"/>
+          <category value="3" label="Satellite Observed Only" symbol="2"/>
+        </categories>
+        <symbols>
+          <symbol type="fill" name="0" alpha="0.75"><layer class="SimpleFill"><Option type="Map"><Option name="color" type="QString" value="0,208,255,190"/><Option name="outline_color" type="QString" value="0,136,204,255"/></Option></layer></symbol>
+          <symbol type="fill" name="1" alpha="0.65"><layer class="SimpleFill"><Option type="Map"><Option name="color" type="QString" value="255,153,0,165"/><Option name="outline_color" type="QString" value="204,102,0,255"/></Option></layer></symbol>
+          <symbol type="fill" name="2" alpha="0.65"><layer class="SimpleFill"><Option type="Map"><Option name="color" type="QString" value="255,51,102,165"/><Option name="outline_color" type="QString" value="179,0,45,255"/></Option></layer></symbol>
         </symbols>
       </renderer-v2>
     </maplayer>
@@ -328,6 +354,7 @@ def build_qgis_project(workspace_root: Path) -> Path:
   <layerorder>
     <layer id="{id_dams}"/>
     <layer id="{id_infra}"/>
+    <layer id="{id_sph_sat}"/>
     <layer id="{id_river}"/>
     <layer id="{id_boundary}"/>
     <layer id="{id_flood_ext}"/>
