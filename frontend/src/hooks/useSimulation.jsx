@@ -126,13 +126,29 @@ export function useSimulation() {
     crs: "EPSG:32644 (UTM 44N)",
   });
 
-  const [currentResult, setCurrentResult] = useState(() => calculateHydrodynamics({
-    breach_width: 15,
-    breach_height: 3,
-    river_dam: "rishiganga",
-    model: "SPH",
-    scenario_id: "scenario_a",
-  }));
+  // Synchronously compute hydrodynamics on every form update (0ms lag)
+  const currentResult = calculateHydrodynamics(form);
+
+  const comparison = {
+    metric: "water_depth",
+    sph_data: {
+      simulation_id: form.simulation_id || "SPH-RISHIGANGA-001",
+      location: { lat: currentResult.location.lat, lon: currentResult.location.lon },
+      water_depth: currentResult.sph_metrics.depth,
+      peak_velocity: currentResult.sph_metrics.peak_vel,
+      arrival_time: currentResult.sph_metrics.arrival_s,
+      timestamp: new Date().toISOString(),
+    },
+    delft3d_data: {
+      simulation_id: "HECRAS-2D-001",
+      location: { lat: currentResult.location.lat, lon: currentResult.location.lon },
+      water_depth: currentResult.hecras_metrics.depth,
+      peak_velocity: currentResult.hecras_metrics.peak_vel,
+      arrival_time: currentResult.hecras_metrics.arrival_s,
+      timestamp: new Date().toISOString(),
+    },
+    timestamp: new Date().toISOString(),
+  };
 
   const [floodExtent, setFloodExtent] = useState({
     simulation_id: "SPH-RISHIGANGA-001",
@@ -140,68 +156,20 @@ export function useSimulation() {
       type: "Polygon",
       coordinates: [
         [
-          [30.472, 79.695],
-          [30.495, 79.702],
-          [30.510, 79.728],
-          [30.488, 79.735],
-          [30.472, 79.695],
+          [30.468, 79.718],
+          [30.470, 79.712],
+          [30.473, 79.704],
+          [30.476, 79.701],
+          [30.474, 79.709],
+          [30.468, 79.718],
         ]
       ],
     },
     arrival_time: 18.0,
   });
 
-  const [comparison, setComparison] = useState({
-    metric: "water_depth",
-    sph_data: {
-      simulation_id: "SPH-RISHIGANGA-001",
-      location: { lat: 30.485, lon: 79.712 },
-      water_depth: 3.85,
-      peak_velocity: 102.37,
-      arrival_time: 18.0,
-      timestamp: new Date().toISOString(),
-    },
-    delft3d_data: {
-      simulation_id: "HECRAS-2D-001",
-      location: { lat: 30.485, lon: 79.712 },
-      water_depth: 4.31,
-      peak_velocity: 33.2,
-      arrival_time: 32.5,
-      timestamp: new Date().toISOString(),
-    },
-    timestamp: new Date().toISOString(),
-  });
-
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState(null);
-
-  // Synchronize dynamic hydrodynamics when form changes
-  useEffect(() => {
-    const dynamicResult = calculateHydrodynamics(form);
-    setCurrentResult(dynamicResult);
-    
-    // Update comparison data dynamically
-    setComparison({
-      metric: "water_depth",
-      sph_data: {
-        simulation_id: form.simulation_id || "SPH-RISHIGANGA-001",
-        location: { lat: dynamicResult.location.lat, lon: dynamicResult.location.lon },
-        water_depth: dynamicResult.sph_metrics.depth,
-        peak_velocity: dynamicResult.sph_metrics.peak_vel,
-        arrival_time: dynamicResult.sph_metrics.arrival_s,
-        timestamp: new Date().toISOString(),
-      },
-      delft3d_data: {
-        simulation_id: "HECRAS-2D-001",
-        location: { lat: dynamicResult.location.lat, lon: dynamicResult.location.lon },
-        water_depth: dynamicResult.hecras_metrics.depth,
-        peak_velocity: dynamicResult.hecras_metrics.peak_vel,
-        arrival_time: dynamicResult.hecras_metrics.arrival_s,
-        timestamp: new Date().toISOString(),
-      },
-      timestamp: new Date().toISOString(),
-    });
-  }, [form]);
 
   // Load initial dashboard state
   useEffect(() => {
@@ -229,7 +197,7 @@ export function useSimulation() {
     loadState();
   }, []);
 
-  // Form change handler
+  // Form change handler with full numeric & range support
   const onFormChange = useCallback(
     (e) => {
       const { name, value, type, checked } = e.target;
@@ -237,8 +205,8 @@ export function useSimulation() {
       if (name === "river-dam") fieldName = "river_dam";
       if (name === "scenario") fieldName = "scenario_id";
 
-      let parsedValue;
-      if (type === "number") {
+      let parsedValue = value;
+      if (type === "number" || type === "range" || fieldName === "breach_width" || fieldName === "breach_height") {
         parsedValue = value === "" ? "" : Number(value);
       } else if (type === "checkbox") {
         parsedValue = checked;
@@ -246,14 +214,19 @@ export function useSimulation() {
         parsedValue = true;
       } else if (value === "false") {
         parsedValue = false;
-      } else {
-        parsedValue = value;
       }
 
-      setForm((prev) => ({
-        ...prev,
-        [fieldName]: parsedValue,
-      }));
+      setForm((prev) => {
+        const next = { ...prev, [fieldName]: parsedValue };
+        if (fieldName === "scenario_id") {
+          const sc = DEMO_SCENARIOS.find((s) => s.id === parsedValue);
+          if (sc) {
+            next.breach_width = sc.breach_width;
+            next.breach_height = sc.breach_height;
+          }
+        }
+        return next;
+      });
     },
     []
   );

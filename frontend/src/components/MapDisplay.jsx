@@ -136,11 +136,12 @@ function MapDisplay({
   // Helper to extract and validate coordinates from any nested format
   const extractPolygonCoords = (extent) => {
     const fallback = [
-      [6.12, 100.42],
-      [6.35, 100.38],
-      [6.42, 100.55],
-      [6.20, 100.62],
-      [6.12, 100.42],
+      [30.468, 79.718],
+      [30.470, 79.712],
+      [30.473, 79.704],
+      [30.476, 79.701],
+      [30.474, 79.709],
+      [30.468, 79.718],
     ];
 
     if (!extent) return fallback;
@@ -162,8 +163,8 @@ function MapDisplay({
       .map(([a, b]) => {
         const numA = Number(a);
         const numB = Number(b);
-        // Ensure lat, lon order (lat ~ 5-7, lon ~ 70-105)
-        return (numA > 30 && numB < 30) ? [numB, numA] : [numA, numB];
+        // Ensure lat, lon order for India (lat ~ 8-36, lon ~ 68-98)
+        return (numA > 60 && numB < 40) ? [numB, numA] : [numA, numB];
       });
 
     return valid.length >= 3 ? valid : fallback;
@@ -182,7 +183,7 @@ function MapDisplay({
       }
 
       const baseCoords = extractPolygonCoords(floodExtent);
-      const origin = [6.2, 100.5];
+      const origin = [activeLat, activeLon];
       const scale = Math.max(0.1, timeStep / 60);
 
       const scaledCoords = baseCoords.map(([lat, lon]) => [
@@ -211,8 +212,8 @@ function MapDisplay({
           <strong style="color:${polyColor};">Hydrodynamic Inundation Front</strong><br/>
           <b>Elapsed Time:</b> T+${timeStep} minutes<br/>
           <b>Peak Wave Depth:</b> ${currentDepth} m<br/>
-          <b>Propagation Velocity:</b> 4.8 m/s<br/>
-          <b>Area Covered:</b> ${(1.2 * (timeStep / 60)).toFixed(2)} km²
+          <b>Propagation Velocity:</b> ${currentResult?.peak_velocity_mps || 102.37} m/s<br/>
+          <b>Area Covered:</b> ${(Number(currentResult?.flooded_area_km2 || 1.2) * (timeStep / 60)).toFixed(2)} km²
         </div>
       `);
 
@@ -220,7 +221,7 @@ function MapDisplay({
     } catch (err) {
       console.warn("Error rendering flood polygon on Leaflet map:", err);
     }
-  }, [floodExtent, currentResult, comparison, timeStep]);
+  }, [floodExtent, currentResult, comparison, timeStep, activeLat, activeLon]);
 
   // Handle Sentinel-1 SAR Layer Toggle
   useEffect(() => {
@@ -228,13 +229,14 @@ function MapDisplay({
     if (!map) return;
 
     if (showSAR && !layersRef.current.sarLayer) {
-      // Sentinel-1 SAR satellite detected flood polygon
+      // Sentinel-1 SAR satellite detected flood polygon (Uttarakhand Reach)
       const sarCoords = [
-        [6.14, 100.41],
-        [6.33, 100.39],
-        [6.40, 100.54],
-        [6.21, 100.60],
-        [6.14, 100.41],
+        [30.467, 79.720],
+        [30.471, 79.710],
+        [30.474, 79.703],
+        [30.477, 79.699],
+        [30.475, 79.708],
+        [30.467, 79.720],
       ];
       const sarPoly = L.polygon(sarCoords, {
         color: "#9b5de5",
@@ -243,7 +245,7 @@ function MapDisplay({
         dashArray: "6, 6",
         weight: 2,
       }).addTo(map);
-      sarPoly.bindPopup("<b>🛰️ Sentinel-1 SAR Flood Detection</b><br/>Sensor: C-Band SAR (VV/VH)<br/>Confidence: 94.2%<br/>Observation: Near-Real-Time Baseline Diff");
+      sarPoly.bindPopup("<b>🛰️ Sentinel-1 SAR Flood Detection (Uttarakhand)</b><br/>Sensor: C-Band SAR (VV/VH)<br/>Confidence: 94.2%<br/>Observation: Near-Real-Time Baseline Difference");
       layersRef.current.sarLayer = sarPoly;
     } else if (!showSAR && layersRef.current.sarLayer) {
       map.removeLayer(layersRef.current.sarLayer);
