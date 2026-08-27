@@ -262,9 +262,9 @@ class SimulationService:
         if not request.simulation_id or not request.simulation_id.strip():
             raise ValueError("simulation_id is required")
 
-        if request.model not in [ModelType.SPH, ModelType.DELFT3D]:
+        if request.model not in [ModelType.SPH, ModelType.HECRAS]:
             raise ValueError(
-                f"Invalid model type: {request.model}. Must be SPH or Delft3D."
+                f"Invalid model type: {request.model}. Must be SPH or HEC-RAS."
             )
 
         if not request.scenario_id or not request.scenario_id.strip():
@@ -632,9 +632,9 @@ def setup_sample_data():
         },
     }
 
-    _simulation_store["sim_delft3d_001"] = {
-        "simulation_id": "sim_delft3d_001",
-        "model": ModelType.DELFT3D.value,
+    _simulation_store["sim_hecras_001"] = {
+        "simulation_id": "sim_hecras_001",
+        "model": ModelType.HECRAS.value,
         "scenario_id": "scenario_b",
         "breach_width": 15.0,
         "breach_height": 3.0,
@@ -643,8 +643,8 @@ def setup_sample_data():
         "created_at": now,
         "updated_at": now,
         "request": {
-            "simulation_id": "sim_delft3d_001",
-            "model": ModelType.DELFT3D.value,
+            "simulation_id": "sim_hecras_001",
+            "model": ModelType.HECRAS.value,
             "scenario_id": "scenario_b",
             "breach_width": 15.0,
             "breach_height": 3.0,
