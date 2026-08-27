@@ -127,7 +127,7 @@ function ControlPanel({
         <div className="hydro-preview-card">
           <div className="hydro-preview-title">⚡ Real-Time Physics Estimate</div>
           <div className="hydro-preview-row">
-            <span>Peak Breach Discharge ($Q_p$):</span>
+            <span>Peak Breach Discharge (Q_p):</span>
             <strong>{estDischarge.toLocaleString()} m³/s</strong>
           </div>
           <div className="hydro-preview-row">

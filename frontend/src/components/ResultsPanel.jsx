@@ -201,15 +201,15 @@ function ResultsPanel({
               <div className="result-value" style={{ fontSize: "1.3rem", fontWeight: "bold", color: "#f8fafc" }}>{floodedArea} km²</div>
             </div>
             <div className="result-item" style={{ background: "#151f33", padding: "12px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.08)" }}>
-              <div className="result-label" style={{ fontSize: "0.75rem", color: "#94a3b8" }}>Max Flood Depth ($h_{max}$)</div>
+              <div className="result-label" style={{ fontSize: "0.75rem", color: "#94a3b8" }}>Max Flood Depth (h_max)</div>
               <div className="result-value" style={{ fontSize: "1.3rem", fontWeight: "bold", color: "#e94560" }}>{maxDepth} m</div>
             </div>
             <div className="result-item" style={{ background: "#151f33", padding: "12px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.08)" }}>
-              <div className="result-label" style={{ fontSize: "0.75rem", color: "#94a3b8" }}>Wave Arrival Time ($t_a$)</div>
+              <div className="result-label" style={{ fontSize: "0.75rem", color: "#94a3b8" }}>Wave Arrival Time (t_a)</div>
               <div className="result-value" style={{ fontSize: "1.3rem", fontWeight: "bold", color: "#f59e0b" }}>{arrivalTimeS} s</div>
             </div>
             <div className="result-item" style={{ background: "#151f33", padding: "12px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.08)" }}>
-              <div className="result-label" style={{ fontSize: "0.75rem", color: "#94a3b8" }}>Peak Discharge ($Q_p$)</div>
+              <div className="result-label" style={{ fontSize: "0.75rem", color: "#94a3b8" }}>Peak Discharge (Q_p)</div>
               <div className="result-value" style={{ fontSize: "1.3rem", fontWeight: "bold", color: "#38bdf8" }}>{Number(peakDischarge).toLocaleString()} m³/s</div>
             </div>
             <div className="result-item" style={{ background: "#151f33", padding: "12px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.08)" }}>
