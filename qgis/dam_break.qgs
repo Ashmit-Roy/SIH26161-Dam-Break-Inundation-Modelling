@@ -23,29 +23,31 @@
     <custom-order enabled="0"/>
     
     <layer-tree-group name="Dam Break Simulation Results" expanded="1" checked="Qt::Checked">
-      <layer-tree-layer name="Dam Locations" id="dam_locations_5ed0a331" checked="Qt::Checked"/>
-      <layer-tree-layer name="Critical Infrastructure" id="critical_infra_890ba98e" checked="Qt::Checked"/>
-      <layer-tree-layer name="SPH vs Satellite Hazard Overlay" id="sph_sat_overlay_55edd029" checked="Qt::Checked"/>
-      <layer-tree-layer name="Flood Inundation Extent" id="flood_extent_8166eea2" checked="Qt::Checked"/>
-      <layer-tree-layer name="Flood Hazard Zones" id="hazard_zones_9180d790" checked="Qt::Unchecked"/>
-      <layer-tree-layer name="Peak Flood Depth (m)" id="flood_depth_c4716e1a" checked="Qt::Checked"/>
-      <layer-tree-layer name="Max Flow Velocity (m/s)" id="flow_velocity_81b7fdb6" checked="Qt::Unchecked"/>
+      <layer-tree-layer name="Dam Locations" id="dam_locations_be9dbd81" checked="Qt::Checked"/>
+      <layer-tree-layer name="Critical Infrastructure" id="critical_infra_6cfa5413" checked="Qt::Checked"/>
+      <layer-tree-layer name="Impacted Bridges" id="delft_bridges_6082dba6" checked="Qt::Checked"/>
+      <layer-tree-layer name="Inundated Roads &amp; Highway" id="delft_roads_9ea7e035" checked="Qt::Checked"/>
+      <layer-tree-layer name="SPH vs Satellite Hazard Overlay" id="sph_sat_overlay_f5e8dc39" checked="Qt::Checked"/>
+      <layer-tree-layer name="Flood Inundation Extent" id="flood_extent_b7be3004" checked="Qt::Checked"/>
+      <layer-tree-layer name="Flood Hazard Zones" id="hazard_zones_5fd53232" checked="Qt::Unchecked"/>
+      <layer-tree-layer name="Peak Flood Depth (m)" id="flood_depth_a24a256d" checked="Qt::Checked"/>
+      <layer-tree-layer name="Max Flow Velocity (m/s)" id="flow_velocity_94997094" checked="Qt::Unchecked"/>
     </layer-tree-group>
     
     <layer-tree-group name="Hydrology &amp; Basework" expanded="1" checked="Qt::Checked">
-      <layer-tree-layer name="River Reach Centerline" id="river_reach_814139d0" checked="Qt::Checked"/>
-      <layer-tree-layer name="Study Area Basin Boundary" id="study_boundary_03ac31b6" checked="Qt::Checked"/>
+      <layer-tree-layer name="River Reach Centerline" id="river_reach_1c43b8ab" checked="Qt::Checked"/>
+      <layer-tree-layer name="Study Area Basin Boundary" id="study_boundary_4722ab1a" checked="Qt::Checked"/>
     </layer-tree-group>
     
     <layer-tree-group name="Terrain &amp; Elevation" expanded="1" checked="Qt::Checked">
-      <layer-tree-layer name="Terrain Hillshade" id="hillshade_5aad0ca1" checked="Qt::Checked"/>
-      <layer-tree-layer name="Rishi Ganga DEM (30m)" id="dem_f142580d" checked="Qt::Unchecked"/>
+      <layer-tree-layer name="Terrain Hillshade" id="hillshade_9327be1d" checked="Qt::Checked"/>
+      <layer-tree-layer name="Rishi Ganga DEM (30m)" id="dem_218f931a" checked="Qt::Unchecked"/>
     </layer-tree-group>
   </layer-tree-group>
   
   <projectlayers>
     <!-- Vector: Dam Locations -->
-    <maplayer type="vector" id="dam_locations_5ed0a331" name="Dam Locations" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+    <maplayer type="vector" id="dam_locations_be9dbd81" name="Dam Locations" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
       <datasource>./data/vector/dam_locations.geojson</datasource>
       <layername>Dam Locations</layername>
       <srs>
@@ -72,7 +74,7 @@
     </maplayer>
     
     <!-- Vector: Critical Infrastructure -->
-    <maplayer type="vector" id="critical_infra_890ba98e" name="Critical Infrastructure" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+    <maplayer type="vector" id="critical_infra_6cfa5413" name="Critical Infrastructure" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
       <datasource>./data/vector/critical_infrastructure.geojson</datasource>
       <layername>Critical Infrastructure</layername>
       <srs>
@@ -98,8 +100,59 @@
       </renderer-v2>
     </maplayer>
 
+    <!-- Vector: Delft3D Damaged Bridges -->
+    <maplayer type="vector" id="delft_bridges_6082dba6" name="Impacted Bridges" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+      <datasource>./outputs/delft3d_damaged_bridges.geojson</datasource>
+      <layername>Impacted Bridges</layername>
+      <srs>
+        <spatialrefsys nativeFormat="Wkt">
+          <authid>EPSG:4326</authid>
+          <description>WGS 84</description>
+        </spatialrefsys>
+      </srs>
+      <renderer-v2 type="singleSymbol" symbollevels="0">
+        <symbols>
+          <symbol type="marker" name="0" alpha="1" clip_to_extent="1">
+            <layer class="SimpleMarker" enabled="1" locked="0">
+              <Option type="Map">
+                <Option name="color" type="QString" value="220,20,60,255"/>
+                <Option name="outline_color" type="QString" value="255,255,255,255"/>
+                <Option name="outline_width" type="QString" value="0.8"/>
+                <Option name="size" type="QString" value="5.0"/>
+                <Option name="name" type="QString" value="cross2"/>
+              </Option>
+            </layer>
+          </symbol>
+        </symbols>
+      </renderer-v2>
+    </maplayer>
+
+    <!-- Vector: Delft3D Inundated Roads -->
+    <maplayer type="vector" id="delft_roads_9ea7e035" name="Inundated Roads &amp; Highway" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+      <datasource>./outputs/delft3d_damaged_roads.geojson</datasource>
+      <layername>Inundated Roads &amp; Highway</layername>
+      <srs>
+        <spatialrefsys nativeFormat="Wkt">
+          <authid>EPSG:4326</authid>
+          <description>WGS 84</description>
+        </spatialrefsys>
+      </srs>
+      <renderer-v2 type="singleSymbol" symbollevels="0">
+        <symbols>
+          <symbol type="line" name="0" alpha="1" clip_to_extent="1">
+            <layer class="SimpleLine" enabled="1" locked="0">
+              <Option type="Map">
+                <Option name="line_color" type="QString" value="230,50,50,255"/>
+                <Option name="line_width" type="QString" value="1.8"/>
+              </Option>
+            </layer>
+          </symbol>
+        </symbols>
+      </renderer-v2>
+    </maplayer>
+
     <!-- Vector: River Reach -->
-    <maplayer type="vector" id="river_reach_814139d0" name="River Reach Centerline" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+    <maplayer type="vector" id="river_reach_1c43b8ab" name="River Reach Centerline" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
       <datasource>./data/vector/river_centerline.geojson</datasource>
       <layername>River Reach Centerline</layername>
       <srs>
@@ -123,7 +176,7 @@
     </maplayer>
 
     <!-- Vector: Basin Boundary -->
-    <maplayer type="vector" id="study_boundary_03ac31b6" name="Study Area Basin Boundary" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+    <maplayer type="vector" id="study_boundary_4722ab1a" name="Study Area Basin Boundary" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
       <datasource>./data/vector/study_area_boundary.geojson</datasource>
       <layername>Study Area Basin Boundary</layername>
       <srs>
@@ -148,7 +201,7 @@
     </maplayer>
 
     <!-- Vector: SPH vs Satellite Hazard Overlay -->
-    <maplayer type="vector" id="sph_sat_overlay_55edd029" name="SPH vs Satellite Hazard Overlay" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+    <maplayer type="vector" id="sph_sat_overlay_f5e8dc39" name="SPH vs Satellite Hazard Overlay" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
       <datasource>./outputs/sph_satellite_overlay.geojson</datasource>
       <layername>SPH vs Satellite Hazard Overlay</layername>
       <srs>
@@ -172,7 +225,7 @@
     </maplayer>
 
     <!-- Vector: Flood Extent -->
-    <maplayer type="vector" id="flood_extent_8166eea2" name="Flood Inundation Extent" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+    <maplayer type="vector" id="flood_extent_b7be3004" name="Flood Inundation Extent" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
       <datasource>./outputs/flood_extent.geojson</datasource>
       <layername>Flood Inundation Extent</layername>
       <srs>
@@ -197,7 +250,7 @@
     </maplayer>
 
     <!-- Vector: Hazard Zones -->
-    <maplayer type="vector" id="hazard_zones_9180d790" name="Flood Hazard Zones" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+    <maplayer type="vector" id="hazard_zones_5fd53232" name="Flood Hazard Zones" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
       <datasource>./outputs/hazard_zones.geojson</datasource>
       <layername>Flood Hazard Zones</layername>
       <srs>
@@ -223,7 +276,7 @@
     </maplayer>
 
     <!-- Raster: Flood Depth -->
-    <maplayer type="raster" id="flood_depth_c4716e1a" name="Peak Flood Depth (m)" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories" autoRefreshMode="Disabled">
+    <maplayer type="raster" id="flood_depth_a24a256d" name="Peak Flood Depth (m)" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories" autoRefreshMode="Disabled">
       <datasource>./outputs/flood_depth.tif</datasource>
       <layername>Peak Flood Depth (m)</layername>
       <srs>
@@ -247,7 +300,7 @@
     </maplayer>
 
     <!-- Raster: Flow Velocity -->
-    <maplayer type="raster" id="flow_velocity_81b7fdb6" name="Max Flow Velocity (m/s)" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories" autoRefreshMode="Disabled">
+    <maplayer type="raster" id="flow_velocity_94997094" name="Max Flow Velocity (m/s)" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories" autoRefreshMode="Disabled">
       <datasource>./outputs/flow_velocity.tif</datasource>
       <layername>Max Flow Velocity (m/s)</layername>
       <srs>
@@ -271,7 +324,7 @@
     </maplayer>
 
     <!-- Raster: Hillshade -->
-    <maplayer type="raster" id="hillshade_5aad0ca1" name="Terrain Hillshade" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories" autoRefreshMode="Disabled">
+    <maplayer type="raster" id="hillshade_9327be1d" name="Terrain Hillshade" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories" autoRefreshMode="Disabled">
       <datasource>./outputs/terrain_hillshade.tif</datasource>
       <layername>Terrain Hillshade</layername>
       <srs>
@@ -292,7 +345,7 @@
     </maplayer>
 
     <!-- Raster: DEM -->
-    <maplayer type="raster" id="dem_f142580d" name="Rishi Ganga DEM (30m)" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories" autoRefreshMode="Disabled">
+    <maplayer type="raster" id="dem_218f931a" name="Rishi Ganga DEM (30m)" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories" autoRefreshMode="Disabled">
       <datasource>./data/dem/rishi_ganga_dem_30m.tif</datasource>
       <layername>Rishi Ganga DEM (30m)</layername>
       <srs>
@@ -318,17 +371,19 @@
   </projectlayers>
   
   <layerorder>
-    <layer id="dam_locations_5ed0a331"/>
-    <layer id="critical_infra_890ba98e"/>
-    <layer id="sph_sat_overlay_55edd029"/>
-    <layer id="river_reach_814139d0"/>
-    <layer id="study_boundary_03ac31b6"/>
-    <layer id="flood_extent_8166eea2"/>
-    <layer id="hazard_zones_9180d790"/>
-    <layer id="flood_depth_c4716e1a"/>
-    <layer id="flow_velocity_81b7fdb6"/>
-    <layer id="hillshade_5aad0ca1"/>
-    <layer id="dem_f142580d"/>
+    <layer id="dam_locations_be9dbd81"/>
+    <layer id="critical_infra_6cfa5413"/>
+    <layer id="delft_bridges_6082dba6"/>
+    <layer id="delft_roads_9ea7e035"/>
+    <layer id="sph_sat_overlay_f5e8dc39"/>
+    <layer id="river_reach_1c43b8ab"/>
+    <layer id="study_boundary_4722ab1a"/>
+    <layer id="flood_extent_b7be3004"/>
+    <layer id="hazard_zones_5fd53232"/>
+    <layer id="flood_depth_a24a256d"/>
+    <layer id="flow_velocity_94997094"/>
+    <layer id="hillshade_9327be1d"/>
+    <layer id="dem_218f931a"/>
   </layerorder>
   
   <properties>

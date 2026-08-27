@@ -23,6 +23,8 @@ def build_qgis_project(workspace_root: Path) -> Path:
     id_dams = f"dam_locations_{uuid.uuid4().hex[:8]}"
     id_infra = f"critical_infra_{uuid.uuid4().hex[:8]}"
     id_sph_sat = f"sph_sat_overlay_{uuid.uuid4().hex[:8]}"
+    id_delft_roads = f"delft_roads_{uuid.uuid4().hex[:8]}"
+    id_delft_bridges = f"delft_bridges_{uuid.uuid4().hex[:8]}"
     id_river = f"river_reach_{uuid.uuid4().hex[:8]}"
     id_boundary = f"study_boundary_{uuid.uuid4().hex[:8]}"
     id_flood_ext = f"flood_extent_{uuid.uuid4().hex[:8]}"
@@ -59,6 +61,8 @@ def build_qgis_project(workspace_root: Path) -> Path:
     <layer-tree-group name="Dam Break Simulation Results" expanded="1" checked="Qt::Checked">
       <layer-tree-layer name="Dam Locations" id="{id_dams}" checked="Qt::Checked"/>
       <layer-tree-layer name="Critical Infrastructure" id="{id_infra}" checked="Qt::Checked"/>
+      <layer-tree-layer name="Impacted Bridges" id="{id_delft_bridges}" checked="Qt::Checked"/>
+      <layer-tree-layer name="Inundated Roads &amp; Highway" id="{id_delft_roads}" checked="Qt::Checked"/>
       <layer-tree-layer name="SPH vs Satellite Hazard Overlay" id="{id_sph_sat}" checked="Qt::Checked"/>
       <layer-tree-layer name="Flood Inundation Extent" id="{id_flood_ext}" checked="Qt::Checked"/>
       <layer-tree-layer name="Flood Hazard Zones" id="{id_hazard}" checked="Qt::Unchecked"/>
@@ -125,6 +129,57 @@ def build_qgis_project(workspace_root: Path) -> Path:
                 <Option name="outline_width" type="QString" value="0.5"/>
                 <Option name="size" type="QString" value="4.0"/>
                 <Option name="name" type="QString" value="triangle"/>
+              </Option>
+            </layer>
+          </symbol>
+        </symbols>
+      </renderer-v2>
+    </maplayer>
+
+    <!-- Vector: Delft3D Damaged Bridges -->
+    <maplayer type="vector" id="{id_delft_bridges}" name="Impacted Bridges" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+      <datasource>./outputs/delft3d_damaged_bridges.geojson</datasource>
+      <layername>Impacted Bridges</layername>
+      <srs>
+        <spatialrefsys nativeFormat="Wkt">
+          <authid>EPSG:4326</authid>
+          <description>WGS 84</description>
+        </spatialrefsys>
+      </srs>
+      <renderer-v2 type="singleSymbol" symbollevels="0">
+        <symbols>
+          <symbol type="marker" name="0" alpha="1" clip_to_extent="1">
+            <layer class="SimpleMarker" enabled="1" locked="0">
+              <Option type="Map">
+                <Option name="color" type="QString" value="220,20,60,255"/>
+                <Option name="outline_color" type="QString" value="255,255,255,255"/>
+                <Option name="outline_width" type="QString" value="0.8"/>
+                <Option name="size" type="QString" value="5.0"/>
+                <Option name="name" type="QString" value="cross2"/>
+              </Option>
+            </layer>
+          </symbol>
+        </symbols>
+      </renderer-v2>
+    </maplayer>
+
+    <!-- Vector: Delft3D Inundated Roads -->
+    <maplayer type="vector" id="{id_delft_roads}" name="Inundated Roads &amp; Highway" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+      <datasource>./outputs/delft3d_damaged_roads.geojson</datasource>
+      <layername>Inundated Roads &amp; Highway</layername>
+      <srs>
+        <spatialrefsys nativeFormat="Wkt">
+          <authid>EPSG:4326</authid>
+          <description>WGS 84</description>
+        </spatialrefsys>
+      </srs>
+      <renderer-v2 type="singleSymbol" symbollevels="0">
+        <symbols>
+          <symbol type="line" name="0" alpha="1" clip_to_extent="1">
+            <layer class="SimpleLine" enabled="1" locked="0">
+              <Option type="Map">
+                <Option name="line_color" type="QString" value="230,50,50,255"/>
+                <Option name="line_width" type="QString" value="1.8"/>
               </Option>
             </layer>
           </symbol>
@@ -354,6 +409,8 @@ def build_qgis_project(workspace_root: Path) -> Path:
   <layerorder>
     <layer id="{id_dams}"/>
     <layer id="{id_infra}"/>
+    <layer id="{id_delft_bridges}"/>
+    <layer id="{id_delft_roads}"/>
     <layer id="{id_sph_sat}"/>
     <layer id="{id_river}"/>
     <layer id="{id_boundary}"/>

@@ -111,7 +111,27 @@
 | File Path | `outputs/sph_satellite_validation_report.json` |
 | Metrics | IoU (Jaccard Index), Dice / F1 Score, Critical Success Index (CSI), Hit Rate / Sensitivity (TPR), False Alarm Ratio (FAR), SPH Area (ha), Satellite Area (ha), Agreement Area (ha) |
 
+### 3.9 Delft3D GIS Deliverables & Shapefiles
+
+| Property | Value |
+|---|---|
+| File Paths | `outputs/delft3d_flood_extent.shp` / `.gpkg` / `.geojson`, `outputs/delft3d_damaged_roads.shp` / `.gpkg` / `.geojson`, `outputs/delft3d_damaged_bridges.shp` / `.gpkg` / `.geojson` |
+| Formats | ESRI Shapefile (`.shp`), OGC GeoPackage (`.gpkg`), GeoJSON (`.geojson`), OGC KML (`.kml`) |
+| Raster Inputs | `delft3d_max_depth.tif`, `delft3d_arrival_time.tif` (or ASCII Grid / NetCDF) |
+| Projected CRS | `EPSG:32644` (WGS 84 / UTM Zone 44N) |
+| Web / KML CRS | `EPSG:4326` (WGS 84 geographic coordinates) |
+
+### 3.10 Road & Bridge Spatial Damage Assessment
+
+| Property | Value |
+|---|---|
+| File Path | `outputs/delft3d_road_bridge_damage_assessment.json` |
+| KML Export | `outputs/delft3d_dam_break_damage_assessment.kml` |
+| Road Assessment | Flooded segment length (km), percentage inundated, accessibility severance, severity class, replacement cost (INR) |
+| Bridge Assessment | Bridge location, deck elevation, overtopping water depth (m), structural risk (washout vs submerged deck), replacement cost (INR) |
+
 ## 4. Validation Rules
 
 All ingested files must be validated for: existence, readable metadata, CRS presence, value ranges, and missing-data handling. Numerical failures must not be silently ignored (AGENTS.md §35).
+
 

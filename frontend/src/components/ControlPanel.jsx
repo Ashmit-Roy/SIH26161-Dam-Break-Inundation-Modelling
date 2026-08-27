@@ -9,142 +9,166 @@ function ControlPanel({
   ModelType,
   setSimulationStatus,
 }) {
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      onChange({ target: { name: "simulation_id", value: file.name } });
-    }
+  const handleScenarioSelect = (scenarioId) => {
+    onChange({ target: { name: "scenario_id", value: scenarioId } });
   };
+
+  const breachWidth = Number(form.breach_width) || 15;
+  const breachHeight = Number(form.breach_height) || 3;
+  const estDischarge = Math.round(0.607 * Math.sqrt(9.81) * breachWidth * Math.pow(breachHeight, 1.5) * 1.45);
 
   return (
     <aside className="control-panel">
-      <h2>🏗️ Simulation Controls</h2>
+      <div className="panel-header-badge">
+        <h2>🏗️ Hydraulic Scenario Setup</h2>
+        <span className="live-engine-tag">DualSPHysics 5.4</span>
+      </div>
 
       <form onSubmit={onSubmit} className="control-form">
+        {/* River Basin / Reach */}
         <div className="form-group">
-          <label htmlFor="river-dam">River / Dam</label>
+          <label htmlFor="river_dam">River Basin & Study Reach</label>
           <select
-            id="river-dam"
-            name="river-dam"
-            value={form.river_dam ?? ""}
+            id="river_dam"
+            name="river_dam"
+            value={form.river_dam ?? "rishiganga"}
             onChange={onChange}
             disabled={isRunning}
+            className="modern-select"
           >
-            <option value="">Select demo river/dam</option>
-            <option value="river_a">River A - Himalayan Tributary</option>
-            <option value="river_b">River B - Delta Region</option>
-            <option value="river_c">River C - Urban Reach</option>
+            <option value="rishiganga">🌊 Rishiganga Gorge & Reni Reach (Uttarakhand)</option>
+            <option value="chamoli">🏔️ Dhauliganga - Chamoli River Reach</option>
+            <option value="tehri">🏞️ Tehri Reservoir & Dam Gorge</option>
+            <option value="mullaperiyar">🌲 Periyar River Basin Reach</option>
           </select>
         </div>
 
+        {/* Hydraulic Model Architecture */}
         <div className="form-group">
-          <label htmlFor="model">Hydraulic Model</label>
+          <label htmlFor="model">Hydrodynamic Solver Architecture</label>
           <select
             id="model"
             name="model"
-            value={form.model}
+            value={form.model ?? "SPH"}
             onChange={onChange}
             disabled={isRunning}
+            className="modern-select"
           >
-            <option value="SPH">SPH (Smoothed Particle Hydrodynamics)</option>
-            <option value="Delft3D">Delft3D / Delft3D FM</option>
-            <option value="both">Both (Comparison)</option>
+            <option value="SPH">💧 3D SPH (DualSPHysics Particle Navier-Stokes)</option>
+            <option value="Delft3D">🌊 2D HEC-RAS / Delft3D (Shallow Water SWE)</option>
+            <option value="both">⚡ Dual-Model Comparison (3D SPH vs 2D HEC-RAS)</option>
           </select>
         </div>
 
+        {/* Preset Scenarios */}
         <div className="form-group">
-          <label htmlFor="scenario">Scenario</label>
+          <label htmlFor="scenario_id">Calibrated Breach Scenario</label>
           <select
-            id="scenario"
-            name="scenario"
+            id="scenario_id"
+            name="scenario_id"
             value={form.scenario_id ?? "scenario_a"}
-            onChange={onChange}
+            onChange={(e) => handleScenarioSelect(e.target.value)}
             disabled={isRunning}
+            className="modern-select"
           >
             {(DEMO_SCENARIOS || []).map((scenario) => (
               <option key={scenario.id} value={scenario.id}>
-                {scenario.label || scenario.name || scenario.id}
+                {scenario.label}
               </option>
             ))}
           </select>
         </div>
 
+        {/* Breach Geometry Controls */}
         <div className="form-group">
-          <label htmlFor="breach-width">Breach Width (m)</label>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <label htmlFor="breach-width">Breach Width (m)</label>
+            <span className="slider-val-badge">{breachWidth} m</span>
+          </div>
           <input
             id="breach-width"
-            type="number"
+            type="range"
             name="breach_width"
-            value={form.breach_width ?? ""}
+            value={breachWidth}
             onChange={onChange}
             disabled={isRunning}
-            placeholder="e.g., 15"
-            min="1"
-            max="100"
+            min="5"
+            max="80"
+            step="1"
+            className="modern-slider"
           />
         </div>
 
         <div className="form-group">
-          <label htmlFor="breach-height">Breach Height (m)</label>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <label htmlFor="breach-height">Breach Depth / Water Head (m)</label>
+            <span className="slider-val-badge">{breachHeight} m</span>
+          </div>
           <input
             id="breach-height"
-            type="number"
+            type="range"
             name="breach_height"
-            value={form.breach_height ?? ""}
+            value={breachHeight}
             onChange={onChange}
             disabled={isRunning}
-            placeholder="e.g., 3"
-            min="0.5"
-            max="10"
+            min="1"
+            max="15"
+            step="0.5"
+            className="modern-slider"
           />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="crs">Coordinate System</label>
-          <input
-            id="crs"
-            type="text"
-            name="crs"
-            value={form.crs ?? "EPSG:4326"}
-            onChange={onChange}
-            disabled={isRunning}
-            placeholder="EPSG:4326"
-          />
+        {/* Live Hydrodynamic Estimation Preview */}
+        <div className="hydro-preview-card">
+          <div className="hydro-preview-title">⚡ Real-Time Physics Estimate</div>
+          <div className="hydro-preview-row">
+            <span>Peak Breach Discharge (Q_p):</span>
+            <strong>{estDischarge.toLocaleString()} m³/s</strong>
+          </div>
+          <div className="hydro-preview-row">
+            <span>Spatial Reference:</span>
+            <code>EPSG:32644 (UTM 44N)</code>
+          </div>
         </div>
 
         <button
           type="submit"
           disabled={isRunning}
-          className="btn-run"
+          className={`btn-run ${isRunning ? "btn-running" : ""}`}
         >
-          {isRunning ? "Running Simulation..." : "Run Simulation"}
+          {isRunning ? (
+            <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+              <span className="spinner-icon">⏳</span> Computing Hydrodynamics...
+            </span>
+          ) : (
+            "🚀 Execute Hydraulic Simulation"
+          )}
         </button>
       </form>
 
+      {/* Quick Scenario Cards */}
       <div className="scenarios-section">
-        <h3>Quick Scenarios</h3>
+        <h3>⚡ Quick Scenario Selector</h3>
         <div className="scenarios-grid">
-          {(DEMO_SCENARIOS || []).map((scenario) => (
-            <div
-              key={scenario.id}
-              className="scenario-card"
-              onClick={() => {
-                onChange({ target: { name: "scenario_id", value: scenario.id } });
-                onChange({
-                  target: { name: "breach_width", value: scenario.breach_width || scenario.breachWidth || 10 },
-                });
-                onChange({
-                  target: { name: "breach_height", value: scenario.breach_height || scenario.breachHeight || 2 },
-                });
-              }}
-            >
-              <div className="scenario-icon">📊</div>
-              <div>
-                <strong>{scenario.label || scenario.name}</strong><br/>
-                {scenario.breach_width || scenario.breachWidth || 10} m width × {scenario.breach_height || scenario.breachHeight || 2} m height
+          {(DEMO_SCENARIOS || []).map((scenario) => {
+            const isSelected = form.scenario_id === scenario.id;
+            return (
+              <div
+                key={scenario.id}
+                className={`scenario-card ${isSelected ? "scenario-card-active" : ""}`}
+                onClick={() => handleScenarioSelect(scenario.id)}
+              >
+                <div className="scenario-header">
+                  <span className="scenario-badge">{scenario.id.toUpperCase()}</span>
+                  <strong>{scenario.label.split("—")[0]}</strong>
+                </div>
+                <div className="scenario-specs">
+                  📐 {scenario.breach_width}m width × {scenario.breach_height}m depth
+                </div>
+                <div className="scenario-desc">{scenario.desc}</div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </aside>

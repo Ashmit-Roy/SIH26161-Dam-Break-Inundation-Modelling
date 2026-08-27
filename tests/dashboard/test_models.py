@@ -24,7 +24,7 @@ def test_simulation_request():
 
 def test_model_type_enum():
     assert ModelType.SPH.value == "SPH"
-    assert ModelType.DELFT3D.value == "Delft3D"
+    assert ModelType.HECRAS.value == "HEC-RAS"
 
 
 def test_comparison_metric_enum():

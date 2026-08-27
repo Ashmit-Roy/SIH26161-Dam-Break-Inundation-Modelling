@@ -27,6 +27,18 @@ async def get_simulation_result(simulation_id: str):
     return await SimulationService.get_simulation_result(simulation_id)
 
 
+@router.get("/simulation/state")
+async def get_dashboard_state():
+    """Get current dashboard simulation state."""
+    return await SimulationService.get_dashboard_state()
+
+
+@router.post("/simulation/state")
+async def update_dashboard_state(state_update: dict):
+    """Update current dashboard simulation state."""
+    return await SimulationService.update_dashboard_state(state_update)
+
+
 @router.get("/simulations/sph/summary")
 async def get_sph_simulation_summary():
     """Get the full DualSPHysics SPH hydrodynamic simulation summary & hydrograph metrics."""

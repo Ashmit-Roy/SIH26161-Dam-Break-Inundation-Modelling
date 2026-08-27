@@ -32,16 +32,23 @@ const DEFAULT_SPH_TIME_SERIES = [
   { time_s: 61.0, particle_count: 61, max_velocity_mps: 0.0, mean_velocity_mps: 0.0, front_position_x_local_m: 0.0 },
 ];
 
-function HydrographChart({ timeSeries, activeTimeStep = 12, onSelectTime = null }) {
+function HydrographChart({ timeSeries, peakVelocity = 102.37, activeTimeStep = 12, onSelectTime = null }) {
   const [hoveredPoint, setHoveredPoint] = useState(null);
   const [showMean, setShowMean] = useState(true);
 
   const data = useMemo(() => {
-    if (Array.isArray(timeSeries) && timeSeries.length > 0) {
-      return timeSeries;
-    }
-    return DEFAULT_SPH_TIME_SERIES;
-  }, [timeSeries]);
+    const base = (Array.isArray(timeSeries) && timeSeries.length > 0)
+      ? timeSeries
+      : DEFAULT_SPH_TIME_SERIES;
+    
+    // Scale velocities relative to peakVelocity
+    const scaleFactor = (peakVelocity || 102.37) / 102.37;
+    return base.map((pt) => ({
+      ...pt,
+      max_velocity_mps: Number((pt.max_velocity_mps * scaleFactor).toFixed(2)),
+      mean_velocity_mps: Number((pt.mean_velocity_mps * scaleFactor).toFixed(2)),
+    }));
+  }, [timeSeries, peakVelocity]);
 
   // Chart dimensions
   const width = 640;

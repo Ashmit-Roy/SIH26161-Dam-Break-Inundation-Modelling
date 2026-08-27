@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 class ModelType(str, Enum):
     SPH = "SPH"
-    DELFT3D = "Delft3D"
+    HECRAS = "HEC-RAS"
 
 
 class ComparisonMetric(str, Enum):
@@ -28,7 +28,7 @@ class SimulationStatus(str, Enum):
 
 class SimulationRequest(BaseModel):
     simulation_id: str = Field(..., description="Unique simulation identifier")
-    model: ModelType = Field(..., description="Hydraulic model: SPH or Delft3D")
+    model: ModelType = Field(..., description="Hydraulic model: SPH or HEC-RAS")
     scenario_id: str = Field(..., description="Scenario identifier")
     breach_width: Optional[float] = Field(None, description="Breach width in meters")
     breach_height: Optional[float] = Field(None, description="Breach height in meters")
@@ -73,6 +73,9 @@ class ModelComparisonResult(BaseModel):
     metric: ComparisonMetric = Field(..., description="Comparison metric")
     sph_data: Optional[WaterDepthResult] = Field(
         None, description="SPH result data"
+    )
+    hecras_data: Optional[WaterDepthResult] = Field(
+        None, description="HEC-RAS result data"
     )
     delft3d_data: Optional[WaterDepthResult] = Field(
         None, description="Delft3D result data"

@@ -1,7 +1,15 @@
-# Python & Node
+# Node
+node_modules/
+frontend/node_modules/
+package-lock.json
+*.aux.xml
+
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
+*.egg-info/
+*.egg-info
 node_modules/
 .env
 .venv/
@@ -23,4 +31,50 @@ scratch/
 # Large Datasets (>50MB)
 data/raw/
 *.tif
+*.tiff
 *.dem
+*.asc
+*.grd
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+*.kml
+*.kmz
+*.geojson
+*.gpkg
+*.hdf5
+*.h5
+*.nc
+
+# Simulation outputs / generated files
+output/
+outputs/
+CaseRishiganga_out/
+*.out
+*.bi4
+*.ibi4
+*.obi4
+*.vtk
+*.stl
+*.Part*
+*.Resume*
+
+# Allow SPH results contract for GIS and Dashboard teammates
+!src/simulation/sph/case_rishiganga/results/**
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Node / Frontend
+node_modules/
+frontend/node_modules/
+.vite/
+frontend/.vite/
+dist/
+frontend/dist/
+
