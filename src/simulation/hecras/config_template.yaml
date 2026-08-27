@@ -1,0 +1,46 @@
+# Sample HEC-RAS 7.0.1 Dam-Break Simulation Configuration
+simulation_id: "hecras_sim_001"
+scenario_id: "rishiganga_dam_break_scenario"
+version: "7.0.1"
+project_name: "Rishiganga_Dam_Break"
+project_dir: "hec_ras"
+
+geometry:
+  area_name: "Rishiganga_2D"
+  cell_size_x: 10.0
+  cell_size_y: 10.0
+  terrain_raster: "data/dem_rishiganga_2021_clipped.tif"
+  friction_manning_n: 0.035
+
+boundary:
+  conditions:
+    - name: "Upstream_Breach"
+      type: "flow_hydrograph"
+      flow_value_m3s: 1500.0
+    - name: "Downstream_Outlet"
+      type: "normal_depth"
+      friction_slope: 0.02
+
+breach:
+  enabled: true
+  breach_center_x: 374065.55
+  breach_center_y: 3371264.45
+  bottom_width: 30.0
+  top_width: 60.0
+  crest_level: 1950.0
+  formation_time_s: 1800.0
+  side_slope: 1.0
+
+timestep:
+  computation_interval_s: 2.0
+  hydrograph_output_interval_s: 60.0
+  mapping_interval_s: 60.0
+  simulation_duration_s: 7200.0
+
+output:
+  output_dir: "data/hecras_output"
+  export_water_depth_tif: true
+  export_flood_extent_geojson: true
+  export_velocity_tif: true
+
+crs: "EPSG:32644"

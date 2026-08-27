@@ -1,32 +1,30 @@
-# Python
+# Python & Node
 __pycache__/
 *.py[cod]
-*.egg-info/
-.eggs/
-build/
-dist/
+*$py.class
+node_modules/
+.env
 .venv/
-venv/
 env/
 
-# Testing / tooling
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.coverage
-htmlcov/
+# HEC-RAS Binary Outputs & Locks (Ignore large binary outputs)
+hec_ras/*.hdf
+hec_ras/*.tmp.hdf
+hec_ras/*.lock
+hec_ras/*.dss
+hec_ras/Terrain/*.tif
+hec_ras/Terrain/*.hdf
 
-# Environment / secrets
-.env
-.env.*
-*.key
+# Temporary & Scratch Files
+scratch/
+.system_generated/
+*.log
 
-# Jupyter
-.ipynb_checkpoints/
-
-# GIS / large data artifacts (do not commit large datasets)
+# Large Datasets (>50MB)
+data/raw/
 *.tif
 *.tiff
+*.dem
 *.asc
 *.grd
 *.shp
