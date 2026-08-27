@@ -261,7 +261,8 @@ function MapDisplay({
     layersRef.current.shelterMarkers = [];
 
     if (showShelters) {
-      SHELTERS.forEach((s) => {
+      const activeShelters = REACH_SHELTERS[activeReachKey] || REACH_SHELTERS.rishiganga;
+      activeShelters.forEach((s) => {
         const icon = L.divIcon({
           className: "shelter-icon",
           html: `<div style="background:${s.type === 'hospital' ? '#00b4d8' : '#2ec4b6'}; color:white; border-radius:4px; padding:3px 6px; font-size:11px; font-weight:bold; border:1px solid white; box-shadow:0 1px 4px rgba(0,0,0,0.3);">${s.type === 'hospital' ? '🏥 Hospital' : '🛡️ Safe Zone'}</div>`,
@@ -275,7 +276,7 @@ function MapDisplay({
         layersRef.current.shelterMarkers.push(marker);
       });
     }
-  }, [showShelters]);
+  }, [showShelters, activeReachKey]);
 
   return (
     <div className="flood-map-area">
