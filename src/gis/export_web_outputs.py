@@ -493,6 +493,16 @@ def run_full_gis_pipeline(
             metrics=overlay_metrics,
         )
 
+    # 7. Delft3D / Grid Simulation Processing: GIS Depth Maps, Shapefiles, KML, Road & Bridge Damage Overlay
+    print("--- 7. Processing Delft3D Hydrodynamic Depth Maps & Road/Bridge Damage Overlay ---")
+    from src.gis.delft3d_processor import process_delft3d_hydrodynamic_outputs
+
+    delft3d_damage = process_delft3d_hydrodynamic_outputs(
+        max_depth_raster_path=depth_path,
+        arrival_time_raster_path=arr_path,
+        outputs_dir=outputs_dir,
+    )
+
     summary = {
         "study_area": "Rishi Ganga - Dhauliganga Valley (Chamoli, Uttarakhand)",
         "simulation_scenario": "Dam-Break Outflow Wave Propagation",
@@ -515,6 +525,11 @@ def run_full_gis_pipeline(
             ),
         },
         "sph_vs_satellite_overlay": overlay_metrics,
+        "delft3d_road_bridge_damage": {
+            "flooded_roads_km": delft3d_damage["road_network_damage_analysis"]["total_flooded_road_length_km"],
+            "impacted_bridges": delft3d_damage["bridge_infrastructure_damage_analysis"]["impacted_bridges_count"],
+            "total_loss_crores": delft3d_damage["total_infrastructure_loss_estimate"]["total_loss_crores"],
+        },
         "affected_critical_infrastructure": affected_infra,
         "exported_files": {
             "vectors": [
@@ -526,6 +541,10 @@ def run_full_gis_pipeline(
                 "outputs/study_area_boundary.geojson",
                 "outputs/sph_satellite_overlay.geojson",
                 "outputs/sph_satellite_overlay.kml",
+                "outputs/delft3d_flood_extent.shp",
+                "outputs/delft3d_damaged_roads.shp",
+                "outputs/delft3d_damaged_bridges.shp",
+                "outputs/delft3d_dam_break_damage_assessment.kml",
             ],
             "rasters": [
                 "outputs/flood_depth.tif",
@@ -544,7 +563,7 @@ def run_full_gis_pipeline(
     with open(metadata_path, "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
 
-    print("--- 7. GIS Pipeline Successfully Completed! ---")
+    print("--- 8. End-to-End GIS Pipeline Successfully Completed! ---")
     return summary
 
 
