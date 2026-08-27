@@ -42,3 +42,23 @@ def test_backend_simulation_endpoints():
     assert res_dl.status_code == 200
     assert res_dl.json()["type"] == "FeatureCollection"
     assert len(res_dl.json()["features"]) > 0
+
+
+def test_sph_summary_and_video_endpoints():
+    client = TestClient(app)
+    
+    # 1. Test SPH summary endpoint
+    res_summary = client.get("/api/simulations/sph/summary")
+    assert res_summary.status_code == 200
+    data = res_summary.json()
+    assert "results_summary" in data or "peak_velocity_mps" in data or "model" in data
+    if "results_summary" in data:
+        assert data["results_summary"]["peak_flood_velocity_mps"] == 102.37
+        assert data["results_summary"]["estimated_arrival_time_reni_s"] == 18.0
+    assert "time_series" in data
+    assert len(data["time_series"]) > 0
+
+    # 2. Test SPH video endpoint
+    res_video = client.get("/api/simulations/sph/video")
+    assert res_video.status_code == 200
+

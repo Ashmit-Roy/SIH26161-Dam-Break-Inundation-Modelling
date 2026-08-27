@@ -330,3 +330,17 @@ export async function pollSimulationStatus(
   // Timeout reached
   return { completed: false, status: SimulationStatus.TIMED_OUT };
 }
+
+/**
+ * Gets the DualSPHysics SPH simulation hydrodynamic summary & time-series dataset.
+ * Calls GET /api/simulations/sph/summary
+ */
+export async function getSphSimulationSummary(): Promise<any> {
+  try {
+    const resp = await apiRequest("/api/simulations/sph/summary");
+    return await resp.json();
+  } catch (err) {
+    console.warn("Failed to fetch SPH simulation summary from API:", err);
+    return null;
+  }
+}

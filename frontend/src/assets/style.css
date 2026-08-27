@@ -254,14 +254,24 @@ body {
   justify-content: center;
 }
 
+/* Panels Wrapper */
+.panels-wrapper {
+  flex: 1.2;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 480px;
+}
+
 /* Results Panel */
 .results-panel {
-  flex: 0 0 320px;
+  width: 100%;
   background: var(--secondary-color);
   border-radius: 8px;
   padding: 1.25rem;
   height: fit-content;
 }
+
 
 .results-panel h2 {
   color: var(--accent-color);
@@ -687,4 +697,26 @@ body {
 /* Reduced Motion for Leaflet */
 .leaflet-tile-loaded {
   animation: none !important;
+}
+
+/* SPH Hydrograph & 3D Simulation Player Animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.02);
+  }
+}
+
+.hydrograph-card svg circle:hover {
+  filter: drop-shadow(0 0 6px rgba(233, 69, 96, 0.8));
+}
+
+.simulation-video-player canvas {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }
