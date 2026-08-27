@@ -1,0 +1,12 @@
+{
+  "model": "HEC-RAS 2D",
+  "scenario": "Rishiganga Dam Break 2D Unsteady",
+  "crs": "EPSG:32644",
+  "active_cells": 10748,
+  "max_wse_m": 4390.32958984375,
+  "min_wse_m": 1785.1905517578125,
+  "gis_files": [
+    "data/gis_outputs/flood_summary.json",
+    "data/gis_outputs/cell_centers_results.geojson"
+  ]
+}

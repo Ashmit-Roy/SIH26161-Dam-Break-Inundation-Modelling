@@ -1,0 +1,70 @@
+ 
+                                              HEC-RAS - River Analysis System
+ 
+ 
+Project File:  C:\Users\KIIT\Downloads\Hackathon\SIH26161-Dam-Break-Inundation-Modelling\hec_ras\Rishiganga_Dam_Break.prj
+ 
+Project Name:  Rishiganga_Dam_Break
+ 
+ 
+Plan Name:     Dam_Break_Run_1
+ 
+Short ID:      Run1
+ 
+
+Starting Time:   31Dec1999 2400
+
+Ending Time:     01Jan2000 0400
+
+
+                ################################################
+                #                                              #
+                #                                              #
+                #       1D and 2D Unsteady Flow Module         #
+                #                                              #
+                #                                              #
+                #          HEC-RAS 7.0.1 June 2026             #
+                #                                              #
+                #             27AUG26 at 23:15:43              #
+                #                                              #
+                ################################################
+                
+ 
+ 
+ 
+
+         US Inflow      DS Outflow       Lat Hydro        SA Hydro     Groundwater      Diversions   Precip Excess
+         *********      **********       *********        ********     ***********      **********   *************
+                                                                                                                                  
+
+    Start 1D Reach  Final 1D Reach   Starting SA's      Final SA's
+    **************  **************   *************      **********
+                                                                  
+
+
+
+                 ***   Volume Accounting for 2D Flow Area in 1000 m^3   ***
+
+           2D Area    Starting Vol      Ending Vol      Cum Inflow     Cum Outflow           Error   Percent Error
+           *******    ************      **********      **********     ***********           *****   *************
+ 
+ 
+     Rishiganga_2D                           4734.           4734.                       -0.002065    0.0000436222
+
+
+
+                 ***  Total Volume Accounting (for the entire model) in 1000 m^3   ***
+
+Total Boundary Flux of Water In            4734.
+Total Boundary Flux of Water Out    0.0000000000
+
+Starting Volume                     0.0000000000
+Ending Volume                              4734.
+
+
+                             Error   Percent Error
+                             *****   *************
+                         -0.002065    0.0000436222
+
+
+
