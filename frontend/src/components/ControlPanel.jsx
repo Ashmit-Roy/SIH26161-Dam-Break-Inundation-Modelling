@@ -10,12 +10,7 @@ function ControlPanel({
   setSimulationStatus,
 }) {
   const handleScenarioSelect = (scenarioId) => {
-    const sc = (DEMO_SCENARIOS || []).find((s) => s.id === scenarioId);
-    if (sc) {
-      onChange({ target: { name: "scenario_id", value: sc.id } });
-      onChange({ target: { name: "breach_width", value: sc.breach_width } });
-      onChange({ target: { name: "breach_height", value: sc.breach_height } });
-    }
+    onChange({ target: { name: "scenario_id", value: scenarioId } });
   };
 
   const breachWidth = Number(form.breach_width) || 15;
