@@ -4,12 +4,24 @@ import "leaflet/dist/leaflet.css";
 
 L.Icon.Default.imagePath = "https://unpkg.com/leaflet@1.9.4/dist/images";
 
-// Emergency Shelters & Critical Infrastructure Markers
-const SHELTERS = [
-  { id: 1, name: "District Relief Shelter A (High Ground)", lat: 6.45, lon: 100.32, type: "shelter", capacity: "1,200 people", status: "SAFE" },
-  { id: 2, name: "Community Evacuation Center B", lat: 6.08, lon: 100.35, type: "shelter", capacity: "800 people", status: "SAFE" },
-  { id: 3, name: "District General Hospital", lat: 6.38, lon: 100.68, type: "hospital", capacity: "450 beds", status: "ELEVATED" },
-];
+// Dynamic Emergency Shelters based on Region
+const REACH_SHELTERS = {
+  rishiganga: [
+    { id: 1, name: "Reni Village Relief High Ground", lat: 30.488, lon: 79.702, type: "shelter", capacity: "450 people", status: "SAFE" },
+    { id: 2, name: "Tapovan Emergency Evacuation Post", lat: 30.495, lon: 79.628, type: "hospital", capacity: "120 beds", status: "ELEVATED" },
+    { id: 3, name: "Joshimath Central Command Base", lat: 30.556, lon: 79.566, type: "shelter", capacity: "1,500 people", status: "SAFE" },
+  ],
+  chamoli: [
+    { id: 1, name: "Chamoli District Relief Post", lat: 30.552, lon: 79.615, type: "shelter", capacity: "800 people", status: "SAFE" },
+    { id: 2, name: "Pipalkoti Emergency Medical Post", lat: 30.430, lon: 79.430, type: "hospital", capacity: "200 beds", status: "ELEVATED" },
+  ],
+  tehri: [
+    { id: 1, name: "New Tehri Civil Relief Center", lat: 30.390, lon: 78.470, type: "shelter", capacity: "3,000 people", status: "SAFE" },
+  ],
+  mullaperiyar: [
+    { id: 1, name: "Vandiperiyar High Elevation Camp", lat: 9.580, lon: 77.080, type: "shelter", capacity: "1,200 people", status: "SAFE" },
+  ],
+};
 
 function MapDisplay({
   floodExtent,
@@ -19,6 +31,7 @@ function MapDisplay({
 }) {
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
+  const damMarkerRef = useRef(null);
   const layersRef = useRef({
     floodPolygon: null,
     sarLayer: null,
@@ -31,37 +44,42 @@ function MapDisplay({
   const [showSAR, setShowSAR] = useState(false);
   const [showShelters, setShowShelters] = useState(true);
 
+  const activeReachKey = currentResult?.river_dam || "rishiganga";
+  const activeLat = currentResult?.location?.lat || 30.485;
+  const activeLon = currentResult?.location?.lon || 79.712;
+  const activeZoom = currentResult?.reach_info?.zoom || 12;
+
   // Initialize map once
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
 
     const map = L.map(mapContainerRef.current, {
-      center: [6.25, 100.48],
-      zoom: 10,
+      center: [activeLat, activeLon],
+      zoom: activeZoom,
       preferCanvas: true,
       zoomControl: false,
     });
 
-    // Basemap OSM
-    const baseLayer = L.tileLayer(
-      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-      {
-        attribution: '&copy; OpenStreetMap contributors',
-        maxZoom: 19,
-      }
-    ).addTo(map);
-
-    // Satellite Topo Basemap
+    // Topographic Terrain Basemap
     const topoLayer = L.tileLayer(
       "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
       {
         attribution: '&copy; OpenTopoMap contributors',
         maxZoom: 17,
       }
+    ).addTo(map);
+
+    // Standard OSM Basemap
+    const baseLayer = L.tileLayer(
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19,
+      }
     );
 
     L.control.layers(
-      { "OpenStreetMap": baseLayer, "Topographic Terrain": topoLayer },
+      { "Topographic Mountain Relief": topoLayer, "Standard OpenStreetMap": baseLayer },
       {},
       { position: "topright" }
     ).addTo(map);
@@ -71,15 +89,16 @@ function MapDisplay({
     // Dam Crest Marker
     const damIcon = L.divIcon({
       className: "custom-dam-marker",
-      html: `<div style="background:#e94560; color:white; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; font-weight:bold; box-shadow:0 0 8px rgba(233,69,96,0.8); border:2px solid white;">🌊</div>`,
-      iconSize: [28, 28],
-      iconAnchor: [14, 14],
+      html: `<div style="background:#e94560; color:white; border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; font-weight:bold; box-shadow:0 0 12px rgba(233,69,96,0.9); border:2px solid white; font-size:14px;">🌊</div>`,
+      iconSize: [30, 30],
+      iconAnchor: [15, 15],
     });
 
-    L.marker([6.2, 100.5], { icon: damIcon })
+    const marker = L.marker([activeLat, activeLon], { icon: damIcon })
       .addTo(map)
-      .bindPopup("<b>Main Reservoir Dam Crest</b><br/>Height: 45m · Storage: 120M m³<br/><i>Breach Origin Location</i>");
+      .bindPopup(`<b>${currentResult?.reach_info?.name || "Rishiganga Dam Site"}</b><br/>Breach Location (UTM Zone 44N)<br/><i>Origin of Hydrodynamic Wave</i>`);
 
+    damMarkerRef.current = marker;
     mapInstanceRef.current = map;
 
     setTimeout(() => {
@@ -91,6 +110,17 @@ function MapDisplay({
       mapInstanceRef.current = null;
     };
   }, []);
+
+  // Pan map when reach changes
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+    map.flyTo([activeLat, activeLon], activeZoom, { duration: 1.2 });
+    if (damMarkerRef.current) {
+      damMarkerRef.current.setLatLng([activeLat, activeLon]);
+      damMarkerRef.current.bindPopup(`<b>${currentResult?.reach_info?.name || "Rishiganga Dam Site"}</b><br/>Breach Location (UTM 44N)<br/><i>Origin of Hydrodynamic Wave</i>`);
+    }
+  }, [activeLat, activeLon, activeZoom, currentResult?.reach_info?.name]);
 
   // Animation timeline loop
   useEffect(() => {
