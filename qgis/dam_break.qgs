@@ -23,28 +23,29 @@
     <custom-order enabled="0"/>
     
     <layer-tree-group name="Dam Break Simulation Results" expanded="1" checked="Qt::Checked">
-      <layer-tree-layer name="Dam Locations" id="dam_locations_d9e00e64" checked="Qt::Checked"/>
-      <layer-tree-layer name="Critical Infrastructure" id="critical_infra_2c69f582" checked="Qt::Checked"/>
-      <layer-tree-layer name="Flood Inundation Extent" id="flood_extent_706a7f11" checked="Qt::Checked"/>
-      <layer-tree-layer name="Flood Hazard Zones" id="hazard_zones_ba6264bf" checked="Qt::Unchecked"/>
-      <layer-tree-layer name="Peak Flood Depth (m)" id="flood_depth_b1dd7511" checked="Qt::Checked"/>
-      <layer-tree-layer name="Max Flow Velocity (m/s)" id="flow_velocity_63cbc1b5" checked="Qt::Unchecked"/>
+      <layer-tree-layer name="Dam Locations" id="dam_locations_5ed0a331" checked="Qt::Checked"/>
+      <layer-tree-layer name="Critical Infrastructure" id="critical_infra_890ba98e" checked="Qt::Checked"/>
+      <layer-tree-layer name="SPH vs Satellite Hazard Overlay" id="sph_sat_overlay_55edd029" checked="Qt::Checked"/>
+      <layer-tree-layer name="Flood Inundation Extent" id="flood_extent_8166eea2" checked="Qt::Checked"/>
+      <layer-tree-layer name="Flood Hazard Zones" id="hazard_zones_9180d790" checked="Qt::Unchecked"/>
+      <layer-tree-layer name="Peak Flood Depth (m)" id="flood_depth_c4716e1a" checked="Qt::Checked"/>
+      <layer-tree-layer name="Max Flow Velocity (m/s)" id="flow_velocity_81b7fdb6" checked="Qt::Unchecked"/>
     </layer-tree-group>
     
     <layer-tree-group name="Hydrology &amp; Basework" expanded="1" checked="Qt::Checked">
-      <layer-tree-layer name="River Reach Centerline" id="river_reach_05f88116" checked="Qt::Checked"/>
-      <layer-tree-layer name="Study Area Basin Boundary" id="study_boundary_94c2f820" checked="Qt::Checked"/>
+      <layer-tree-layer name="River Reach Centerline" id="river_reach_814139d0" checked="Qt::Checked"/>
+      <layer-tree-layer name="Study Area Basin Boundary" id="study_boundary_03ac31b6" checked="Qt::Checked"/>
     </layer-tree-group>
     
     <layer-tree-group name="Terrain &amp; Elevation" expanded="1" checked="Qt::Checked">
-      <layer-tree-layer name="Terrain Hillshade" id="hillshade_8a205883" checked="Qt::Checked"/>
-      <layer-tree-layer name="Rishi Ganga DEM (30m)" id="dem_d9a735d6" checked="Qt::Unchecked"/>
+      <layer-tree-layer name="Terrain Hillshade" id="hillshade_5aad0ca1" checked="Qt::Checked"/>
+      <layer-tree-layer name="Rishi Ganga DEM (30m)" id="dem_f142580d" checked="Qt::Unchecked"/>
     </layer-tree-group>
   </layer-tree-group>
   
   <projectlayers>
     <!-- Vector: Dam Locations -->
-    <maplayer type="vector" id="dam_locations_d9e00e64" name="Dam Locations" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+    <maplayer type="vector" id="dam_locations_5ed0a331" name="Dam Locations" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
       <datasource>./data/vector/dam_locations.geojson</datasource>
       <layername>Dam Locations</layername>
       <srs>
@@ -71,7 +72,7 @@
     </maplayer>
     
     <!-- Vector: Critical Infrastructure -->
-    <maplayer type="vector" id="critical_infra_2c69f582" name="Critical Infrastructure" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+    <maplayer type="vector" id="critical_infra_890ba98e" name="Critical Infrastructure" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
       <datasource>./data/vector/critical_infrastructure.geojson</datasource>
       <layername>Critical Infrastructure</layername>
       <srs>
@@ -98,7 +99,7 @@
     </maplayer>
 
     <!-- Vector: River Reach -->
-    <maplayer type="vector" id="river_reach_05f88116" name="River Reach Centerline" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+    <maplayer type="vector" id="river_reach_814139d0" name="River Reach Centerline" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
       <datasource>./data/vector/river_centerline.geojson</datasource>
       <layername>River Reach Centerline</layername>
       <srs>
@@ -122,7 +123,7 @@
     </maplayer>
 
     <!-- Vector: Basin Boundary -->
-    <maplayer type="vector" id="study_boundary_94c2f820" name="Study Area Basin Boundary" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+    <maplayer type="vector" id="study_boundary_03ac31b6" name="Study Area Basin Boundary" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
       <datasource>./data/vector/study_area_boundary.geojson</datasource>
       <layername>Study Area Basin Boundary</layername>
       <srs>
@@ -146,8 +147,32 @@
       </renderer-v2>
     </maplayer>
 
+    <!-- Vector: SPH vs Satellite Hazard Overlay -->
+    <maplayer type="vector" id="sph_sat_overlay_55edd029" name="SPH vs Satellite Hazard Overlay" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+      <datasource>./outputs/sph_satellite_overlay.geojson</datasource>
+      <layername>SPH vs Satellite Hazard Overlay</layername>
+      <srs>
+        <spatialrefsys nativeFormat="Wkt">
+          <authid>EPSG:4326</authid>
+          <description>WGS 84</description>
+        </spatialrefsys>
+      </srs>
+      <renderer-v2 type="categorizedSymbol" attr="category_code" symbollevels="0">
+        <categories>
+          <category value="1" label="Agreement (Simulated &amp; Observed)" symbol="0"/>
+          <category value="2" label="SPH Simulated Only" symbol="1"/>
+          <category value="3" label="Satellite Observed Only" symbol="2"/>
+        </categories>
+        <symbols>
+          <symbol type="fill" name="0" alpha="0.75"><layer class="SimpleFill"><Option type="Map"><Option name="color" type="QString" value="0,208,255,190"/><Option name="outline_color" type="QString" value="0,136,204,255"/></Option></layer></symbol>
+          <symbol type="fill" name="1" alpha="0.65"><layer class="SimpleFill"><Option type="Map"><Option name="color" type="QString" value="255,153,0,165"/><Option name="outline_color" type="QString" value="204,102,0,255"/></Option></layer></symbol>
+          <symbol type="fill" name="2" alpha="0.65"><layer class="SimpleFill"><Option type="Map"><Option name="color" type="QString" value="255,51,102,165"/><Option name="outline_color" type="QString" value="179,0,45,255"/></Option></layer></symbol>
+        </symbols>
+      </renderer-v2>
+    </maplayer>
+
     <!-- Vector: Flood Extent -->
-    <maplayer type="vector" id="flood_extent_706a7f11" name="Flood Inundation Extent" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+    <maplayer type="vector" id="flood_extent_8166eea2" name="Flood Inundation Extent" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
       <datasource>./outputs/flood_extent.geojson</datasource>
       <layername>Flood Inundation Extent</layername>
       <srs>
@@ -172,7 +197,7 @@
     </maplayer>
 
     <!-- Vector: Hazard Zones -->
-    <maplayer type="vector" id="hazard_zones_ba6264bf" name="Flood Hazard Zones" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
+    <maplayer type="vector" id="hazard_zones_9180d790" name="Flood Hazard Zones" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories">
       <datasource>./outputs/hazard_zones.geojson</datasource>
       <layername>Flood Hazard Zones</layername>
       <srs>
@@ -198,7 +223,7 @@
     </maplayer>
 
     <!-- Raster: Flood Depth -->
-    <maplayer type="raster" id="flood_depth_b1dd7511" name="Peak Flood Depth (m)" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories" autoRefreshMode="Disabled">
+    <maplayer type="raster" id="flood_depth_c4716e1a" name="Peak Flood Depth (m)" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories" autoRefreshMode="Disabled">
       <datasource>./outputs/flood_depth.tif</datasource>
       <layername>Peak Flood Depth (m)</layername>
       <srs>
@@ -222,7 +247,7 @@
     </maplayer>
 
     <!-- Raster: Flow Velocity -->
-    <maplayer type="raster" id="flow_velocity_63cbc1b5" name="Max Flow Velocity (m/s)" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories" autoRefreshMode="Disabled">
+    <maplayer type="raster" id="flow_velocity_81b7fdb6" name="Max Flow Velocity (m/s)" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories" autoRefreshMode="Disabled">
       <datasource>./outputs/flow_velocity.tif</datasource>
       <layername>Max Flow Velocity (m/s)</layername>
       <srs>
@@ -246,7 +271,7 @@
     </maplayer>
 
     <!-- Raster: Hillshade -->
-    <maplayer type="raster" id="hillshade_8a205883" name="Terrain Hillshade" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories" autoRefreshMode="Disabled">
+    <maplayer type="raster" id="hillshade_5aad0ca1" name="Terrain Hillshade" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories" autoRefreshMode="Disabled">
       <datasource>./outputs/terrain_hillshade.tif</datasource>
       <layername>Terrain Hillshade</layername>
       <srs>
@@ -267,7 +292,7 @@
     </maplayer>
 
     <!-- Raster: DEM -->
-    <maplayer type="raster" id="dem_d9a735d6" name="Rishi Ganga DEM (30m)" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories" autoRefreshMode="Disabled">
+    <maplayer type="raster" id="dem_f142580d" name="Rishi Ganga DEM (30m)" minScale="1e+08" maxScale="0" styleCategories="AllStyleCategories" autoRefreshMode="Disabled">
       <datasource>./data/dem/rishi_ganga_dem_30m.tif</datasource>
       <layername>Rishi Ganga DEM (30m)</layername>
       <srs>
@@ -293,16 +318,17 @@
   </projectlayers>
   
   <layerorder>
-    <layer id="dam_locations_d9e00e64"/>
-    <layer id="critical_infra_2c69f582"/>
-    <layer id="river_reach_05f88116"/>
-    <layer id="study_boundary_94c2f820"/>
-    <layer id="flood_extent_706a7f11"/>
-    <layer id="hazard_zones_ba6264bf"/>
-    <layer id="flood_depth_b1dd7511"/>
-    <layer id="flow_velocity_63cbc1b5"/>
-    <layer id="hillshade_8a205883"/>
-    <layer id="dem_d9a735d6"/>
+    <layer id="dam_locations_5ed0a331"/>
+    <layer id="critical_infra_890ba98e"/>
+    <layer id="sph_sat_overlay_55edd029"/>
+    <layer id="river_reach_814139d0"/>
+    <layer id="study_boundary_03ac31b6"/>
+    <layer id="flood_extent_8166eea2"/>
+    <layer id="hazard_zones_9180d790"/>
+    <layer id="flood_depth_c4716e1a"/>
+    <layer id="flow_velocity_81b7fdb6"/>
+    <layer id="hillshade_5aad0ca1"/>
+    <layer id="dem_f142580d"/>
   </layerorder>
   
   <properties>

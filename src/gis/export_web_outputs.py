@@ -466,6 +466,33 @@ def run_full_gis_pipeline(
     max_flow_vel_ms = float(np.max(max_vel))
     mean_flow_vel_ms = float(np.mean(max_vel[mask])) if np.any(mask) else 0.0
 
+    # 6. SPH vs Satellite Hazard Map Overlay (if available)
+    sph_extent_file = workspace_root / "src" / "simulation" / "sph" / "case_rishiganga" / "results" / "sph_flood_extent.geojson"
+    sat_hazard_file = data_dir / "satellite_flood_extent.geojson"
+
+    overlay_metrics = None
+    if sph_extent_file.exists() and sat_hazard_file.exists():
+        print("--- 6. Running SPH vs Satellite Hazard Spatial Overlay ---")
+        from src.gis.overlay import overlay_sph_on_satellite_hazard
+        from src.visualization.map_overlay import plot_sph_satellite_overlay_map
+
+        overlay_res = overlay_sph_on_satellite_hazard(
+            sph_extent_path=sph_extent_file,
+            satellite_hazard_path=sat_hazard_file,
+            output_dir=outputs_dir,
+            infrastructure_path=vector_dir / "critical_infrastructure.geojson",
+        )
+        overlay_metrics = overlay_res.get("spatial_agreement_metrics")
+
+        # Generate cartographic overlay visual map
+        plot_sph_satellite_overlay_map(
+            overlay_geojson_path=outputs_dir / "sph_satellite_overlay.geojson",
+            infrastructure_path=vector_dir / "critical_infrastructure.geojson",
+            river_path=vector_dir / "river_centerline.geojson",
+            output_image_path=outputs_dir / "sph_satellite_hazard_overlay.png",
+            metrics=overlay_metrics,
+        )
+
     summary = {
         "study_area": "Rishi Ganga - Dhauliganga Valley (Chamoli, Uttarakhand)",
         "simulation_scenario": "Dam-Break Outflow Wave Propagation",
@@ -487,6 +514,7 @@ def run_full_gis_pipeline(
                 float(np.max(arrival_time[arrival_time < 9000.0])), 1
             ),
         },
+        "sph_vs_satellite_overlay": overlay_metrics,
         "affected_critical_infrastructure": affected_infra,
         "exported_files": {
             "vectors": [
@@ -496,6 +524,8 @@ def run_full_gis_pipeline(
                 "outputs/river_reach.geojson",
                 "outputs/critical_infrastructure.geojson",
                 "outputs/study_area_boundary.geojson",
+                "outputs/sph_satellite_overlay.geojson",
+                "outputs/sph_satellite_overlay.kml",
             ],
             "rasters": [
                 "outputs/flood_depth.tif",
@@ -504,6 +534,9 @@ def run_full_gis_pipeline(
                 "outputs/arrival_time.tif",
                 "outputs/terrain_hillshade.tif",
             ],
+            "visualizations": [
+                "outputs/sph_satellite_hazard_overlay.png",
+            ],
         },
     }
 
@@ -511,7 +544,7 @@ def run_full_gis_pipeline(
     with open(metadata_path, "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
 
-    print("--- 6. GIS Pipeline Successfully Completed! ---")
+    print("--- 7. GIS Pipeline Successfully Completed! ---")
     return summary
 
 
