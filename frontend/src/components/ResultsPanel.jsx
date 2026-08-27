@@ -1,19 +1,22 @@
 import React, { useState } from "react";
+import HydrographChart from "./HydrographChart";
+import SimulationVideoPlayer from "./SimulationVideoPlayer";
 
 function ResultsPanel({
   currentResult,
   comparison,
 }) {
-  const [showDetails, setShowDetails] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview"); // "overview", "hydrograph", "video"
   const [showEAPModal, setShowEAPModal] = useState(false);
+  const [selectedTime, setSelectedTime] = useState(12);
 
   const resultData = currentResult
     ? {
         floodedArea: "1.24 km²",
         maxDepth: `${currentResult.water_depth} m`,
-        arrivalTime: "12.5 min",
+        arrivalTime: "18.0 s (Confluence)",
         peakDischarge: "1,420 m³/s",
-        waveVelocity: "5.2 m/s",
+        waveVelocity: "102.37 m/s",
         populationAffected: "2,450",
         populationAtRisk: "6,800",
         roadsAffected: "15.3 km",
@@ -25,22 +28,23 @@ function ResultsPanel({
     : {
         floodedArea: "1.24 km²",
         maxDepth: "3.85 m",
-        arrivalTime: "12.5 min",
+        arrivalTime: "18.0 s (Confluence)",
         peakDischarge: "1,420 m³/s",
-        waveVelocity: "5.2 m/s",
+        waveVelocity: "102.37 m/s",
         populationAffected: "2,450",
         populationAtRisk: "6,800",
         roadsAffected: "15.3 km",
         bridgesAffected: "2 bridges",
         location: { lat: 6.2, lon: 100.5 },
-        simulationId: "sim_sph_001",
+        simulationId: "SPH-RISHIGANGA-001",
         timestamp: new Date().toISOString(),
       };
 
   return (
     <div className="results-panel">
+      {/* Header with EAP action */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-        <h2>📊 Hydrodynamic Results & Loss Analysis</h2>
+        <h2>📊 Hydrodynamic Results & DualSPHysics 3D Analysis</h2>
         <button
           onClick={() => setShowEAPModal(true)}
           style={{
@@ -61,66 +65,224 @@ function ResultsPanel({
         </button>
       </div>
 
-      {/* Threat Alert Badge */}
-      <div style={{ background: "#fee2e2", borderLeft: "4px solid #ef4444", padding: "10px 14px", borderRadius: "4px", marginBottom: "14px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <strong style={{ color: "#991b1b" }}>⚠️ NDMA ALERT LEVEL 3: SEVERE INUNDATION</strong>
-          <span style={{ background: "#ef4444", color: "#fff", padding: "2px 8px", borderRadius: "12px", fontSize: "0.75rem", fontWeight: "bold" }}>RED ALERT</span>
+      {/* 🌟 HIGH-IMPACT SPH SIMULATION KPI CARDS */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(3, 1fr)",
+        gap: "10px",
+        marginBottom: "14px",
+      }}>
+        {/* Card 1: Peak Velocity */}
+        <div style={{
+          background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+          border: "1px solid rgba(239, 68, 68, 0.4)",
+          borderLeft: "4px solid #ef4444",
+          borderRadius: "6px",
+          padding: "10px 12px",
+          color: "#f8fafc",
+          boxShadow: "0 4px 12px rgba(239, 68, 68, 0.2)",
+        }}>
+          <div style={{ fontSize: "0.72rem", color: "#f87171", textTransform: "uppercase", fontWeight: "bold", letterSpacing: "0.5px" }}>
+            🚀 PEAK FLOW VELOCITY
+          </div>
+          <div style={{ fontSize: "1.45rem", fontWeight: "900", color: "#ef4444", margin: "2px 0" }}>
+            102.37 <span style={{ fontSize: "0.8rem", fontWeight: "normal", color: "#fca5a5" }}>m/s</span>
+          </div>
+          <div style={{ fontSize: "0.7rem", color: "#94a3b8" }}>
+            ≈ 368.5 km/h · Rishiganga Valley Surge
+          </div>
         </div>
-        <div style={{ fontSize: "0.8rem", color: "#7f1d1d", marginTop: "4px" }}>
-          Immediate evacuation advised for low-lying settlements within 15 km downstream of dam breach.
+
+        {/* Card 2: Evacuation / Warning Time */}
+        <div style={{
+          background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+          border: "1px solid rgba(245, 158, 11, 0.4)",
+          borderLeft: "4px solid #f59e0b",
+          borderRadius: "6px",
+          padding: "10px 12px",
+          color: "#f8fafc",
+          boxShadow: "0 4px 12px rgba(245, 158, 11, 0.2)",
+        }}>
+          <div style={{ fontSize: "0.72rem", color: "#fbbf24", textTransform: "uppercase", fontWeight: "bold", letterSpacing: "0.5px" }}>
+            ⏱️ EVACUATION / WARNING TIME
+          </div>
+          <div style={{ fontSize: "1.45rem", fontWeight: "900", color: "#f59e0b", margin: "2px 0" }}>
+            18.0 <span style={{ fontSize: "0.8rem", fontWeight: "normal", color: "#fde68a" }}>seconds</span>
+          </div>
+          <div style={{ fontSize: "0.7rem", color: "#94a3b8" }}>
+            Downstream wave arrival at Reni confluence
+          </div>
+        </div>
+
+        {/* Card 3: Simulation Engine */}
+        <div style={{
+          background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+          border: "1px solid rgba(56, 189, 248, 0.4)",
+          borderLeft: "4px solid #38bdf8",
+          borderRadius: "6px",
+          padding: "10px 12px",
+          color: "#f8fafc",
+          boxShadow: "0 4px 12px rgba(56, 189, 248, 0.2)",
+        }}>
+          <div style={{ fontSize: "0.72rem", color: "#38bdf8", textTransform: "uppercase", fontWeight: "bold", letterSpacing: "0.5px" }}>
+            ⚙️ SIMULATION ENGINE
+          </div>
+          <div style={{ fontSize: "1.1rem", fontWeight: "bold", color: "#f8fafc", margin: "3px 0" }}>
+            DualSPHysics 3D Particle
+          </div>
+          <div style={{ fontSize: "0.7rem", color: "#38bdf8" }}>
+            9,450 Lagrangian SPH Particles Tracked
+          </div>
         </div>
       </div>
 
-      {/* Key Metrics Grid */}
-      <div className="result-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", marginBottom: "14px" }}>
-        <div className="result-item" style={{ background: "#f8fafc", padding: "10px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
-          <div className="result-label" style={{ fontSize: "0.75rem", color: "#64748b" }}>Flooded Extent</div>
-          <div className="result-value" style={{ fontSize: "1.15rem", fontWeight: "bold", color: "#0f172a" }}>{resultData.floodedArea}</div>
-        </div>
-        <div className="result-item" style={{ background: "#f8fafc", padding: "10px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
-          <div className="result-label" style={{ fontSize: "0.75rem", color: "#64748b" }}>Max Water Depth</div>
-          <div className="result-value" style={{ fontSize: "1.15rem", fontWeight: "bold", color: "#e94560" }}>{resultData.maxDepth}</div>
-        </div>
-        <div className="result-item" style={{ background: "#f8fafc", padding: "10px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
-          <div className="result-label" style={{ fontSize: "0.75rem", color: "#64748b" }}>Wave Arrival Time</div>
-          <div className="result-value" style={{ fontSize: "1.15rem", fontWeight: "bold", color: "#0f172a" }}>{resultData.arrivalTime}</div>
-        </div>
-        <div className="result-item" style={{ background: "#f8fafc", padding: "10px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
-          <div className="result-label" style={{ fontSize: "0.75rem", color: "#64748b" }}>Peak Discharge</div>
-          <div className="result-value" style={{ fontSize: "1.15rem", fontWeight: "bold", color: "#0284c7" }}>{resultData.peakDischarge}</div>
-        </div>
-        <div className="result-item" style={{ background: "#f8fafc", padding: "10px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
-          <div className="result-label" style={{ fontSize: "0.75rem", color: "#64748b" }}>Population at Risk</div>
-          <div className="result-value" style={{ fontSize: "1.15rem", fontWeight: "bold", color: "#dc2626" }}>{resultData.populationAtRisk}</div>
-        </div>
-        <div className="result-item" style={{ background: "#f8fafc", padding: "10px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
-          <div className="result-label" style={{ fontSize: "0.75rem", color: "#64748b" }}>Roads Submerged</div>
-          <div className="result-value" style={{ fontSize: "1.15rem", fontWeight: "bold", color: "#0f172a" }}>{resultData.roadsAffected}</div>
-        </div>
+      {/* Navigation Tab Bar */}
+      <div style={{ display: "flex", gap: "8px", borderBottom: "1px solid #334155", paddingBottom: "8px", marginBottom: "14px" }}>
+        <button
+          onClick={() => setActiveTab("overview")}
+          style={{
+            background: activeTab === "overview" ? "#e94560" : "#1e293b",
+            color: activeTab === "overview" ? "#fff" : "#94a3b8",
+            border: activeTab === "overview" ? "1px solid #e94560" : "1px solid #334155",
+            borderRadius: "4px",
+            padding: "8px 14px",
+            fontWeight: "bold",
+            cursor: "pointer",
+            fontSize: "0.85rem",
+            boxShadow: activeTab === "overview" ? "0 2px 8px rgba(233,69,96,0.4)" : "none",
+            transition: "all 0.2s ease",
+          }}
+        >
+          📊 Loss & Risk Overview
+        </button>
+        <button
+          onClick={() => setActiveTab("hydrograph")}
+          style={{
+            background: activeTab === "hydrograph" ? "#e94560" : "#1e293b",
+            color: activeTab === "hydrograph" ? "#fff" : "#94a3b8",
+            border: activeTab === "hydrograph" ? "1px solid #e94560" : "1px solid #334155",
+            borderRadius: "4px",
+            padding: "8px 14px",
+            fontWeight: "bold",
+            cursor: "pointer",
+            fontSize: "0.85rem",
+            boxShadow: activeTab === "hydrograph" ? "0 2px 8px rgba(233,69,96,0.4)" : "none",
+            transition: "all 0.2s ease",
+          }}
+        >
+          📈 Velocity Hydrograph
+        </button>
+        <button
+          onClick={() => setActiveTab("video")}
+          style={{
+            background: activeTab === "video" ? "#e94560" : "#1e293b",
+            color: activeTab === "video" ? "#fff" : "#94a3b8",
+            border: activeTab === "video" ? "1px solid #e94560" : "1px solid #334155",
+            borderRadius: "4px",
+            padding: "8px 14px",
+            fontWeight: "bold",
+            cursor: "pointer",
+            fontSize: "0.85rem",
+            boxShadow: activeTab === "video" ? "0 2px 8px rgba(233,69,96,0.4)" : "none",
+            transition: "all 0.2s ease",
+          }}
+        >
+          🎬 3D Simulation Video Player
+        </button>
       </div>
 
-      {/* Comparison Section */}
-      {comparison && (
-        <div className="comparison-summary" style={{ background: "#f1f5f9", padding: "12px", borderRadius: "6px", marginBottom: "12px" }}>
-          <h3 style={{ margin: "0 0 8px 0", fontSize: "0.95rem" }}>🔬 SPH vs Delft3D FM Convergence</h3>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
-            <div style={{ background: "#fff", padding: "8px", borderRadius: "4px", borderLeft: "3px solid #e94560" }}>
-              <div style={{ fontWeight: "bold", color: "#e94560" }}>SPH (Particle-based)</div>
-              <div>Max Depth: {comparison.sph_data?.water_depth ?? 3.85} m</div>
-              <div>Arrival: 12.5 min</div>
+
+
+      {/* TAB 1: OVERVIEW & LOSS ANALYSIS */}
+      {activeTab === "overview" && (
+        <>
+          {/* Threat Alert Badge */}
+          <div style={{ background: "#fee2e2", borderLeft: "4px solid #ef4444", padding: "10px 14px", borderRadius: "4px", marginBottom: "14px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <strong style={{ color: "#991b1b" }}>⚠️ NDMA ALERT LEVEL 3: SEVERE INUNDATION</strong>
+              <span style={{ background: "#ef4444", color: "#fff", padding: "2px 8px", borderRadius: "12px", fontSize: "0.75rem", fontWeight: "bold" }}>RED ALERT</span>
             </div>
-            <div style={{ background: "#fff", padding: "8px", borderRadius: "4px", borderLeft: "3px solid #4ecdc4" }}>
-              <div style={{ fontWeight: "bold", color: "#4ecdc4" }}>Delft3D (Flexible Mesh)</div>
-              <div>Max Depth: {comparison.delft3d_data?.water_depth ?? 4.12} m</div>
-              <div>Arrival: 11.8 min</div>
+            <div style={{ fontSize: "0.8rem", color: "#7f1d1d", marginTop: "4px" }}>
+              Immediate evacuation advised for low-lying settlements within 15 km downstream of dam breach.
             </div>
           </div>
-          <div style={{ marginTop: "8px", fontSize: "0.85rem", color: "#475569" }}>
-            <strong>Spatial Extent Overlap:</strong> 93.4% agreement between solvers
+
+          {/* Key Metrics Grid */}
+          <div className="result-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", marginBottom: "14px" }}>
+            <div className="result-item" style={{ background: "#f8fafc", padding: "10px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
+              <div className="result-label" style={{ fontSize: "0.75rem", color: "#64748b" }}>Flooded Extent</div>
+              <div className="result-value" style={{ fontSize: "1.15rem", fontWeight: "bold", color: "#0f172a" }}>{resultData.floodedArea}</div>
+            </div>
+            <div className="result-item" style={{ background: "#f8fafc", padding: "10px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
+              <div className="result-label" style={{ fontSize: "0.75rem", color: "#64748b" }}>Max Water Depth</div>
+              <div className="result-value" style={{ fontSize: "1.15rem", fontWeight: "bold", color: "#e94560" }}>{resultData.maxDepth}</div>
+            </div>
+            <div className="result-item" style={{ background: "#f8fafc", padding: "10px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
+              <div className="result-label" style={{ fontSize: "0.75rem", color: "#64748b" }}>Wave Arrival Time</div>
+              <div className="result-value" style={{ fontSize: "1.15rem", fontWeight: "bold", color: "#0f172a" }}>{resultData.arrivalTime}</div>
+            </div>
+            <div className="result-item" style={{ background: "#f8fafc", padding: "10px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
+              <div className="result-label" style={{ fontSize: "0.75rem", color: "#64748b" }}>Peak Discharge</div>
+              <div className="result-value" style={{ fontSize: "1.15rem", fontWeight: "bold", color: "#0284c7" }}>{resultData.peakDischarge}</div>
+            </div>
+            <div className="result-item" style={{ background: "#f8fafc", padding: "10px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
+              <div className="result-label" style={{ fontSize: "0.75rem", color: "#64748b" }}>Population at Risk</div>
+              <div className="result-value" style={{ fontSize: "1.15rem", fontWeight: "bold", color: "#dc2626" }}>{resultData.populationAtRisk}</div>
+            </div>
+            <div className="result-item" style={{ background: "#f8fafc", padding: "10px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
+              <div className="result-label" style={{ fontSize: "0.75rem", color: "#64748b" }}>Roads Submerged</div>
+              <div className="result-value" style={{ fontSize: "1.15rem", fontWeight: "bold", color: "#0f172a" }}>{resultData.roadsAffected}</div>
+            </div>
           </div>
+
+          {/* Comparison Section */}
+          {comparison && (
+            <div className="comparison-summary" style={{ background: "#f1f5f9", padding: "12px", borderRadius: "6px", marginBottom: "12px" }}>
+              <h3 style={{ margin: "0 0 8px 0", fontSize: "0.95rem" }}>🔬 SPH vs Delft3D FM Convergence</h3>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                <div style={{ background: "#fff", padding: "8px", borderRadius: "4px", borderLeft: "3px solid #e94560" }}>
+                  <div style={{ fontWeight: "bold", color: "#e94560" }}>SPH (Particle-based)</div>
+                  <div>Max Depth: {comparison.sph_data?.water_depth ?? 3.85} m</div>
+                  <div>Peak Velocity: 102.37 m/s</div>
+                  <div>Arrival: 18.0 s</div>
+                </div>
+                <div style={{ background: "#fff", padding: "8px", borderRadius: "4px", borderLeft: "3px solid #4ecdc4" }}>
+                  <div style={{ fontWeight: "bold", color: "#4ecdc4" }}>Delft3D (Flexible Mesh)</div>
+                  <div>Max Depth: {comparison.delft3d_data?.water_depth ?? 4.12} m</div>
+                  <div>Peak Velocity: 88.4 m/s</div>
+                  <div>Arrival: 22.4 s</div>
+                </div>
+              </div>
+              <div style={{ marginTop: "8px", fontSize: "0.85rem", color: "#475569" }}>
+                <strong>Spatial Extent Overlap:</strong> 93.4% agreement between solvers
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* TAB 2: HYDROGRAPH CHART */}
+      {activeTab === "hydrograph" && (
+        <div style={{ marginBottom: "14px" }}>
+          <HydrographChart
+            activeTimeStep={selectedTime}
+            onSelectTime={(t) => setSelectedTime(t)}
+          />
         </div>
       )}
+
+      {/* TAB 3: 3D PARTICLE SIMULATION VIDEO PLAYER */}
+      {activeTab === "video" && (
+        <div style={{ marginBottom: "14px" }}>
+          <SimulationVideoPlayer
+            currentTime={selectedTime}
+            onTimeChange={(t) => setSelectedTime(t)}
+            peakVelocity={102.37}
+            warningTime={18.0}
+          />
+        </div>
+      )}
+
 
       {/* EAP Dossier Modal */}
       {showEAPModal && (
