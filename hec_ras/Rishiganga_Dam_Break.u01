@@ -1,0 +1,88 @@
+Flow Title=Dam_Break_Flow
+Program Version=7.01
+Use Restart= 0 
+Boundary Location=                ,                ,        ,        ,                ,Rishiganga_2D   ,                ,Downstream_Outlet               ,                                ,                                
+Interval=15MIN
+Flow Hydrograph= 20 
+       0       0       0       0       0       0       0       0       0       0
+       0       0       0       0       0       0       0       0       0       0
+Stage Hydrograph TW Check=0
+Flow Hydrograph Slope= 0.02 
+DSS Path=
+Use DSS=False
+Use Fixed Start Time=False
+Fixed Start Date/Time=,
+Is Critical Boundary=False
+Critical Boundary Flow=
+Boundary Location=                ,                ,        ,        ,                ,Rishiganga_2D   ,                ,Upstream_Breach                 ,                                ,                                
+Interval=15MIN
+Flow Hydrograph= 20 
+      10     500    1500    1200     800     500     300     150      50      46
+      42      39      35      31      28      24      20      17      13      10
+Stage Hydrograph TW Check=0
+Flow Hydrograph Slope= 0.02 
+DSS Path=
+Use DSS=False
+Use Fixed Start Time=False
+Fixed Start Date/Time=,
+Is Critical Boundary=False
+Critical Boundary Flow=
+Met Point Raster Parameters=,,,,
+Precipitation Mode=Disable
+Wind Mode=No Wind Forces
+Air Density Mode=
+Wave Mode=No Wave Forcing
+Met BC=Precipitation|Expanded View=0
+Met BC=Precipitation|Point Interpolation=Nearest
+Met BC=Precipitation|Gridded Source=DSS
+Met BC=Precipitation|Gridded Interpolation=
+Met BC=Evapotranspiration|Expanded View=0
+Met BC=Evapotranspiration|Point Interpolation=Nearest
+Met BC=Evapotranspiration|Gridded Source=DSS
+Met BC=Evapotranspiration|Gridded Interpolation=
+Met BC=Wind Speed|Expanded View=0
+Met BC=Wind Speed|Point Interpolation=Nearest
+Met BC=Wind Speed|Gridded Source=DSS
+Met BC=Wind Speed|Gridded Interpolation=
+Met BC=Wind Direction|Expanded View=0
+Met BC=Wind Direction|Point Interpolation=Nearest
+Met BC=Wind Direction|Gridded Source=DSS
+Met BC=Wind Direction|Gridded Interpolation=
+Met BC=Wind Velocity X|Expanded View=0
+Met BC=Wind Velocity X|Point Interpolation=Nearest
+Met BC=Wind Velocity X|Gridded Source=DSS
+Met BC=Wind Velocity X|Gridded Interpolation=
+Met BC=Wind Velocity Y|Expanded View=0
+Met BC=Wind Velocity Y|Point Interpolation=Nearest
+Met BC=Wind Velocity Y|Gridded Source=DSS
+Met BC=Wind Velocity Y|Gridded Interpolation=
+Met BC=Wave Forcing X|Expanded View=0
+Met BC=Wave Forcing X|Point Interpolation=Nearest
+Met BC=Wave Forcing X|Gridded Source=DSS
+Met BC=Wave Forcing X|Gridded Interpolation=
+Met BC=Wave Forcing Y|Expanded View=0
+Met BC=Wave Forcing Y|Point Interpolation=Nearest
+Met BC=Wave Forcing Y|Gridded Source=DSS
+Met BC=Wave Forcing Y|Gridded Interpolation=
+Met BC=Air Density|Mode=Constant
+Met BC=Air Density|Expanded View=0
+Met BC=Air Density|Constant Value=1.225
+Met BC=Air Density|Constant Units=kg/m3
+Met BC=Air Density|Point Interpolation=Nearest
+Met BC=Air Density|Gridded Source=DSS
+Met BC=Air Density|Gridded Interpolation=
+Met BC=Air Temperature|Expanded View=0
+Met BC=Air Temperature|Point Interpolation=Nearest
+Met BC=Air Temperature|Gridded Source=DSS
+Met BC=Air Temperature|Gridded Interpolation=
+Met BC=Humidity|Expanded View=0
+Met BC=Humidity|Point Interpolation=Nearest
+Met BC=Humidity|Gridded Source=DSS
+Met BC=Humidity|Gridded Interpolation=
+Met BC=Air Pressure|Mode=Constant
+Met BC=Air Pressure|Expanded View=0
+Met BC=Air Pressure|Constant Value=1013.2
+Met BC=Air Pressure|Constant Units=mb
+Met BC=Air Pressure|Point Interpolation=Inv Distance
+Met BC=Air Pressure|Gridded Source=DSS
+Met BC=Air Pressure|Gridded Interpolation=
