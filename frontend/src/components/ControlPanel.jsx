@@ -22,18 +22,18 @@ function ControlPanel({
 
       <form onSubmit={onSubmit} className="control-form">
         <div className="form-group">
-          <label htmlFor="river-dam">River / Dam</label>
+          <label htmlFor="river_dam">River / Dam Reach</label>
           <select
-            id="river-dam"
-            name="river-dam"
-            value={form.river_dam ?? ""}
+            id="river_dam"
+            name="river_dam"
+            value={form.river_dam ?? "rishiganga"}
             onChange={onChange}
             disabled={isRunning}
           >
-            <option value="">Select demo river/dam</option>
-            <option value="river_a">River A - Himalayan Tributary</option>
-            <option value="river_b">River B - Delta Region</option>
-            <option value="river_c">River C - Urban Reach</option>
+            <option value="rishiganga">🌊 Rishiganga Dam & Gorge (DualSPHysics Case)</option>
+            <option value="chamoli">🏔️ Dhauliganga - Chamoli River Reach</option>
+            <option value="tehri">🏞️ Tehri Reservoir & Dam Reach</option>
+            <option value="mullaperiyar">🌲 Periyar River Basin Reach</option>
           </select>
         </div>
 
@@ -42,7 +42,7 @@ function ControlPanel({
           <select
             id="model"
             name="model"
-            value={form.model}
+            value={form.model ?? "SPH"}
             onChange={onChange}
             disabled={isRunning}
           >
@@ -53,10 +53,10 @@ function ControlPanel({
         </div>
 
         <div className="form-group">
-          <label htmlFor="scenario">Scenario</label>
+          <label htmlFor="scenario_id">Scenario</label>
           <select
-            id="scenario"
-            name="scenario"
+            id="scenario_id"
+            name="scenario_id"
             value={form.scenario_id ?? "scenario_a"}
             onChange={onChange}
             disabled={isRunning}
@@ -81,6 +81,7 @@ function ControlPanel({
             placeholder="e.g., 15"
             min="1"
             max="100"
+            step="any"
           />
         </div>
 
@@ -94,8 +95,9 @@ function ControlPanel({
             onChange={onChange}
             disabled={isRunning}
             placeholder="e.g., 3"
-            min="0.5"
-            max="10"
+            min="0.1"
+            max="20"
+            step="any"
           />
         </div>
 

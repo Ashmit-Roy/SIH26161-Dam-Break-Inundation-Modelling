@@ -82,6 +82,10 @@ function MapDisplay({
 
     mapInstanceRef.current = map;
 
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 250);
+
     return () => {
       map.remove();
       mapInstanceRef.current = null;
@@ -99,59 +103,93 @@ function MapDisplay({
     return () => clearInterval(interval);
   }, [isPlaying]);
 
+  // Helper to extract and validate coordinates from any nested format
+  const extractPolygonCoords = (extent) => {
+    const fallback = [
+      [6.12, 100.42],
+      [6.35, 100.38],
+      [6.42, 100.55],
+      [6.20, 100.62],
+      [6.12, 100.42],
+    ];
+
+    if (!extent) return fallback;
+    let raw = extent.polygon?.coordinates || extent.coordinates || extent.geometry?.coordinates || extent;
+
+    if (!Array.isArray(raw) || raw.length === 0) return fallback;
+
+    // Unpack 3-level or 2-level nested arrays
+    while (Array.isArray(raw[0]) && Array.isArray(raw[0][0]) && Array.isArray(raw[0][0][0])) {
+      raw = raw[0];
+    }
+    if (Array.isArray(raw[0]) && Array.isArray(raw[0][0])) {
+      raw = raw[0];
+    }
+
+    // Filter valid coordinate pairs
+    const valid = raw
+      .filter((pt) => Array.isArray(pt) && pt.length >= 2 && !isNaN(Number(pt[0])) && !isNaN(Number(pt[1])))
+      .map(([a, b]) => {
+        const numA = Number(a);
+        const numB = Number(b);
+        // Ensure lat, lon order (lat ~ 5-7, lon ~ 70-105)
+        return (numA > 30 && numB < 30) ? [numB, numA] : [numA, numB];
+      });
+
+    return valid.length >= 3 ? valid : fallback;
+  };
+
   // Update Inundation Polygon based on timeStep & result
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
 
-    // Clear old polygon
-    if (layersRef.current.floodPolygon) {
-      map.removeLayer(layersRef.current.floodPolygon);
-      layersRef.current.floodPolygon = null;
+    try {
+      // Clear old polygon
+      if (layersRef.current.floodPolygon) {
+        map.removeLayer(layersRef.current.floodPolygon);
+        layersRef.current.floodPolygon = null;
+      }
+
+      const baseCoords = extractPolygonCoords(floodExtent);
+      const origin = [6.2, 100.5];
+      const scale = Math.max(0.1, timeStep / 60);
+
+      const scaledCoords = baseCoords.map(([lat, lon]) => [
+        origin[0] + (lat - origin[0]) * scale,
+        origin[1] + (lon - origin[1]) * scale,
+      ]);
+
+      const isDelft = comparison && !floodExtent;
+      const polyColor = isDelft ? "#4ecdc4" : "#e94560";
+      const polyFill = isDelft ? "#4ecdc4" : "#ff7878";
+
+      const polygon = L.polygon(scaledCoords, {
+        color: polyColor,
+        fillColor: polyFill,
+        fillOpacity: Math.min(0.65, 0.25 + (timeStep / 120)),
+        weight: 2,
+      }).addTo(map);
+
+      const depth = typeof currentResult === "number" 
+        ? currentResult 
+        : (currentResult?.water_depth ?? 3.85);
+      const currentDepth = ((typeof depth === "number" ? depth : 3.85) * (timeStep / 60)).toFixed(2);
+
+      polygon.bindPopup(`
+        <div style="font-size:0.85rem; color:#1e293b;">
+          <strong style="color:${polyColor};">Hydrodynamic Inundation Front</strong><br/>
+          <b>Elapsed Time:</b> T+${timeStep} minutes<br/>
+          <b>Peak Wave Depth:</b> ${currentDepth} m<br/>
+          <b>Propagation Velocity:</b> 4.8 m/s<br/>
+          <b>Area Covered:</b> ${(1.2 * (timeStep / 60)).toFixed(2)} km²
+        </div>
+      `);
+
+      layersRef.current.floodPolygon = polygon;
+    } catch (err) {
+      console.warn("Error rendering flood polygon on Leaflet map:", err);
     }
-
-    const baseCoords = (floodExtent && floodExtent.polygon)
-      ? floodExtent.polygon.coordinates[0]
-      : [
-          [6.12, 100.42],
-          [6.35, 100.38],
-          [6.42, 100.55],
-          [6.20, 100.62],
-          [6.12, 100.42],
-        ];
-
-    // Scale polygon from dam origin based on timeStep (0% to 100%)
-    const origin = [6.2, 100.5];
-    const scale = Math.max(0.1, timeStep / 60);
-
-    const scaledCoords = baseCoords.map(([lat, lon]) => [
-      origin[0] + (lat - origin[0]) * scale,
-      origin[1] + (lon - origin[1]) * scale,
-    ]);
-
-    const isDelft = comparison && !floodExtent;
-    const polyColor = isDelft ? "#4ecdc4" : "#e94560";
-    const polyFill = isDelft ? "#4ecdc4" : "#ff7878";
-
-    const polygon = L.polygon(scaledCoords, {
-      color: polyColor,
-      fillColor: polyFill,
-      fillOpacity: Math.min(0.65, 0.25 + (timeStep / 120)),
-      weight: 2,
-    }).addTo(map);
-
-    const currentDepth = ((currentResult?.water_depth ?? 3.85) * (timeStep / 60)).toFixed(2);
-    polygon.bindPopup(`
-      <div style="font-size:0.85rem;">
-        <strong style="color:${polyColor};">Hydrodynamic Inundation Front</strong><br/>
-        <b>Elapsed Time:</b> T+${timeStep} minutes<br/>
-        <b>Peak Wave Depth:</b> ${currentDepth} m<br/>
-        <b>Propagation Velocity:</b> 4.8 m/s<br/>
-        <b>Area Covered:</b> ${(1.2 * (timeStep / 60)).toFixed(2)} km²
-      </div>
-    `);
-
-    layersRef.current.floodPolygon = polygon;
   }, [floodExtent, currentResult, comparison, timeStep]);
 
   // Handle Sentinel-1 SAR Layer Toggle
@@ -245,8 +283,8 @@ function MapDisplay({
       <div className="map-canvas" ref={mapContainerRef} style={{ height: "450px", width: "100%", borderRadius: "8px" }} />
 
       {/* Dynamic Flood Propagation Timeline Slider */}
-      <div className="timeline-controller" style={{ background: "#ffffff", padding: "12px 16px", borderRadius: "8px", marginTop: "12px", border: "1px solid #e2e8f0", boxShadow: "0 2px 6px rgba(0,0,0,0.05)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+      <div className="timeline-controller" style={{ background: "#0f172a", padding: "14px 18px", borderRadius: "10px", marginTop: "14px", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 4px 16px rgba(0,0,0,0.4)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <button
               onClick={() => setIsPlaying(!isPlaying)}
@@ -254,24 +292,26 @@ function MapDisplay({
                 background: isPlaying ? "#f59e0b" : "#e94560",
                 color: "#fff",
                 border: "none",
-                borderRadius: "4px",
+                borderRadius: "6px",
                 padding: "6px 14px",
                 fontWeight: "bold",
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
-                gap: "4px",
+                gap: "6px",
+                fontSize: "0.85rem",
+                boxShadow: "0 2px 8px rgba(233,69,96,0.4)",
               }}
             >
               {isPlaying ? "⏸ Pause Timeline" : "▶ Play Flood Propagation"}
             </button>
-            <span style={{ fontSize: "0.85rem", color: "#64748b" }}>
-              Dynamic arrival time stepping (0 → 60 mins)
+            <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>
+              Dynamic wave front propagation (0 → 60 mins)
             </span>
           </div>
 
-          <div style={{ fontWeight: "bold", color: "#1e293b", fontSize: "0.95rem" }}>
-            ⏱️ Inundation Time: <span style={{ color: "#e94560", fontSize: "1.1rem" }}>T + {timeStep} min</span>
+          <div style={{ fontWeight: "bold", color: "#f8fafc", fontSize: "0.95rem" }}>
+            ⏱️ Inundation Time: <span style={{ color: "#e94560", fontSize: "1.15rem", fontWeight: "800" }}>T + {timeStep} min</span>
           </div>
         </div>
 
@@ -282,15 +322,15 @@ function MapDisplay({
           step="5"
           value={timeStep}
           onChange={(e) => setTimeStep(Number(e.target.value))}
-          style={{ width: "100%", accentColor: "#e94560", cursor: "pointer" }}
+          style={{ width: "100%", accentColor: "#e94560", cursor: "pointer", height: "6px" }}
         />
 
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", color: "#94a3b8", marginTop: "4px" }}>
-          <span>T+0 min (Breach Occurs)</span>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", color: "#64748b", marginTop: "6px" }}>
+          <span>T+0 min (Breach)</span>
           <span>T+15 min</span>
-          <span>T+30 min (Peak Discharge)</span>
+          <span>T+30 min (Peak Surge)</span>
           <span>T+45 min</span>
-          <span>T+60 min (Full Extent)</span>
+          <span>T+60 min (Maximum Inundation)</span>
         </div>
       </div>
     </div>

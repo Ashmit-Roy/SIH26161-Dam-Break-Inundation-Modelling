@@ -63,3 +63,12 @@ CaseRishiganga_out/
 Thumbs.db
 .idea/
 .vscode/
+
+# Node / Frontend
+node_modules/
+frontend/node_modules/
+.vite/
+frontend/.vite/
+dist/
+frontend/dist/
+

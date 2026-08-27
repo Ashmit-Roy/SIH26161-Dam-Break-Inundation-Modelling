@@ -31,49 +31,85 @@ const DEMO_SCENARIOS = [
 ];
 
 
-// Initial dashboard state (exported for reuse in App.jsx)
 export const INITIAL_DASHBOARD_STATE = {
-  current_simulation: null,
-  simulation_progress: 0.0,
-  comparison_active: false,
+  current_simulation: "SPH-RISHIGANGA-001",
+  simulation_progress: 100.0,
+  comparison_active: true,
   last_update: new Date().toISOString() + "Z",
 };
 
 export function useSimulation() {
   const [state, setState] = useState(INITIAL_DASHBOARD_STATE);
-  const [progress, setProgress] = useState(0);
-  const [currentResult, setCurrentResult] = useState(null);
-  const [floodExtent, setFloodExtent] = useState(null);
-  const [comparison, setComparison] = useState(null);
+  const [progress, setProgress] = useState(100);
+  const [currentResult, setCurrentResult] = useState({
+    simulation_id: "SPH-RISHIGANGA-001",
+    model: "SPH",
+    water_depth: 3.85,
+    location: { lat: 6.2, lon: 100.5 },
+    timestamp: new Date().toISOString(),
+  });
+  const [floodExtent, setFloodExtent] = useState({
+    simulation_id: "SPH-RISHIGANGA-001",
+    polygon: {
+      type: "Polygon",
+      coordinates: [
+        [
+          [6.12, 100.42],
+          [6.35, 100.38],
+          [6.42, 100.55],
+          [6.20, 100.62],
+          [6.12, 100.42],
+        ]
+      ],
+    },
+    arrival_time: 18.0,
+  });
+  const [comparison, setComparison] = useState({
+    metric: "water_depth",
+    sph_data: {
+      simulation_id: "SPH-RISHIGANGA-001",
+      location: { lat: 6.2, lon: 100.5 },
+      water_depth: 3.85,
+      timestamp: new Date().toISOString(),
+    },
+    delft3d_data: {
+      simulation_id: "DELFT3D-FM-001",
+      location: { lat: 6.2, lon: 100.5 },
+      water_depth: 4.12,
+      timestamp: new Date().toISOString(),
+    },
+    timestamp: new Date().toISOString(),
+  });
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState(null);
   /** @type {import("../types").SimulationRequest} */
   const [form, setForm] = useState({
-    simulation_id: "",
+    simulation_id: "SPH-RISHIGANGA-001",
+    river_dam: "rishiganga",
     model: ModelType.SPH,
     scenario_id: "scenario_a",
+    breach_width: 15,
+    breach_height: 3,
+    crs: "EPSG:4326",
   });
 
   // Load initial dashboard state
   useEffect(() => {
     async function loadState() {
       try {
-        const dashboardState = await (async () => {
-          // Try to get from API if available
-          const apiBase = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000";
-          const resp = await fetch(`${apiBase}/api/simulation/state`, {
-            method: "GET",
-            credentials: "omit",
-          });
-          if (resp.ok) {
-            const data = await resp.json();
-            return data;
+        const apiBase = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000";
+        const resp = await fetch(`${apiBase}/api/simulation/state`, {
+          method: "GET",
+          credentials: "omit",
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data && typeof data === "object") {
+            setState(data);
           }
-        })();
-        setState(dashboardState);
+        }
       } catch (e) {
-        // Keep initial state if API not available
-        console.log("Dashboard state loaded from initial mock");
+        console.log("Dashboard state loaded from initial fallback");
       }
     }
     loadState();
@@ -83,12 +119,26 @@ export function useSimulation() {
   const onFormChange = useCallback(
     (e) => {
       const { name, value, type, checked } = e.target;
+      let fieldName = name;
+      if (name === "river-dam") fieldName = "river_dam";
+      if (name === "scenario") fieldName = "scenario_id";
+
+      let parsedValue;
+      if (type === "number") {
+        parsedValue = value === "" ? "" : Number(value);
+      } else if (type === "checkbox") {
+        parsedValue = checked;
+      } else if (value === "true") {
+        parsedValue = true;
+      } else if (value === "false") {
+        parsedValue = false;
+      } else {
+        parsedValue = value;
+      }
+
       setForm((prev) => ({
         ...prev,
-        [name]:
-          type === "number" ? Number(value) : value === "true" ? true : value === "false"
-            ? false
-            : checked,
+        [fieldName]: parsedValue,
       }));
     },
     []
@@ -127,7 +177,7 @@ export function useSimulation() {
 
     // Disable run button during simulation
     setState((prev) => ({
-      ...prev,
+      ...(prev || INITIAL_DASHBOARD_STATE),
       current_simulation: payload.simulation_id,
       simulation_progress: 0.0,
     }));
@@ -137,7 +187,7 @@ export function useSimulation() {
       const result = await runSimulation(payload);
 
       setState((prev) => ({
-        ...prev,
+        ...(prev || INITIAL_DASHBOARD_STATE),
         current_simulation: result.simulation_id,
       }));
 
@@ -146,7 +196,6 @@ export function useSimulation() {
         result.simulation_id,
         (progress, status) => {
           setProgress(progress);
-          // Update status text through state if needed
         }
       );
 
@@ -167,11 +216,11 @@ export function useSimulation() {
       // Fetch full simulation result
       const simResult = await getSimulationResult(result.simulation_id);
       if (simResult) {
-        setCurrentResult(simResult.water_depth);
-        setFloodExtent(simResult.flood_extent);
+        if (simResult.water_depth) setCurrentResult(simResult.water_depth);
+        if (simResult.flood_extent) setFloodExtent(simResult.flood_extent);
 
         // Get comparison if model is "both" or Delft3D
-        if (result.model !== "SPH" || formValues.model === "both") {
+        if (result.model !== "SPH" || payload.model === "both" || form.model === "both") {
           const comparisonResult = await getModelComparison(result.simulation_id);
           if (comparisonResult) {
             setComparison(comparisonResult);
@@ -192,7 +241,6 @@ export function useSimulation() {
             }),
           });
         } catch (e) {
-          // Silently fall back - dashboard state updates on next poll
           console.log("Dashboard state update failed, continuing with results");
         }
       } else {
@@ -205,21 +253,21 @@ export function useSimulation() {
       setIsRunning(false);
       setProgress(0);
     }
-  }, []);
+  }, [form]);
 
   // Load results after simulation ID changes (for cases where results are available separately)
   useEffect(() => {
     async function loadResults() {
-      if (!state.current_simulation) return;
+      if (!state?.current_simulation) return;
 
       try {
         const simResult = await getSimulationResult(state.current_simulation);
         if (simResult) {
-          setCurrentResult(simResult.water_depth);
-          setFloodExtent(simResult.flood_extent);
+          if (simResult.water_depth) setCurrentResult(simResult.water_depth);
+          if (simResult.flood_extent) setFloodExtent(simResult.flood_extent);
 
           // Get comparison if applicable
-          if (state.model !== "SPH" || form.model === "both") {
+          if (state?.model !== "SPH" || form.model === "both") {
             const comparisonResult = await getModelComparison(
               state.current_simulation
             );
@@ -233,7 +281,7 @@ export function useSimulation() {
       }
     }
     loadResults();
-  }, [state.current_simulation]);
+  }, [state?.current_simulation, form.model]);
 
   // Initialize mock data fallback if no backend available and no simulation ID
   useEffect(() => {

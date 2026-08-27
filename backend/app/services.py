@@ -99,11 +99,13 @@ class MockSPHExecution:
             polygon={
                 "type": "Polygon",
                 "coordinates": [
-                    [6.12, 100.42],
-                    [6.35, 100.38],
-                    [6.42, 100.55],
-                    [6.20, 100.62],
-                    [6.12, 100.42],
+                    [
+                        [6.12, 100.42],
+                        [6.35, 100.38],
+                        [6.42, 100.55],
+                        [6.20, 100.62],
+                        [6.12, 100.42],
+                    ]
                 ],
             },
             arrival_time=float(arrival_s),
@@ -151,11 +153,13 @@ class MockDelft3DExecution:
             polygon={
                 "type": "Polygon",
                 "coordinates": [
-                    [6.10, 100.40],
-                    [6.40, 100.35],
-                    [6.48, 100.58],
-                    [6.18, 100.65],
-                    [6.10, 100.40],
+                    [
+                        [6.10, 100.40],
+                        [6.40, 100.35],
+                        [6.48, 100.58],
+                        [6.18, 100.65],
+                        [6.10, 100.40],
+                    ]
                 ],
             },
             arrival_time=11.8,
@@ -339,6 +343,18 @@ class SimulationService:
         )
 
     @staticmethod
+    async def get_dashboard_state() -> Dict[str, Any]:
+        """Get current dashboard simulation state."""
+        return _dashboard_state
+
+    @staticmethod
+    async def update_dashboard_state(state_update: Dict[str, Any]) -> Dict[str, Any]:
+        """Update current dashboard simulation state."""
+        _dashboard_state.update(state_update)
+        _dashboard_state["last_update"] = datetime.datetime.utcnow().isoformat() + "Z"
+        return _dashboard_state
+
+    @staticmethod
     async def get_sph_summary() -> Dict[str, Any]:
         """Get the full DualSPHysics SPH hydrodynamic simulation summary & hydrograph time-series."""
         summary = load_sph_simulation_summary()
@@ -497,11 +513,41 @@ class SimulationService:
             )
 
 
+_dashboard_state: Dict[str, Any] = {
+    "current_simulation": "SPH-RISHIGANGA-001",
+    "simulation_progress": 100.0,
+    "comparison_active": True,
+    "last_update": datetime.datetime.utcnow().isoformat() + "Z",
+}
+
+
 # Setup function to initialize sample data
 def setup_sample_data():
     """Initialize sample simulations for testing."""
     now = datetime.datetime.utcnow().isoformat() + "Z"
     
+    _simulation_store["SPH-RISHIGANGA-001"] = {
+        "simulation_id": "SPH-RISHIGANGA-001",
+        "model": ModelType.SPH.value,
+        "scenario_id": "scenario_a",
+        "breach_width": 15.0,
+        "breach_height": 3.0,
+        "status": SimulationStatus.COMPLETED.value,
+        "progress": 100.0,
+        "created_at": now,
+        "updated_at": now,
+        "request": {
+            "simulation_id": "SPH-RISHIGANGA-001",
+            "model": ModelType.SPH.value,
+            "scenario_id": "scenario_a",
+            "breach_width": 15.0,
+            "breach_height": 3.0,
+        },
+        "comparison_data": {
+            "overlap_area": 9.5,
+        },
+    }
+
     _simulation_store["sim_sph_001"] = {
         "simulation_id": "sim_sph_001",
         "model": ModelType.SPH.value,

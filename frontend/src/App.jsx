@@ -128,7 +128,7 @@ function App() {
       <DownloadSection
         currentResult={currentResult}
         comparison={comparison}
-        simulationId={state.current_simulation}
+        simulationId={state?.current_simulation}
       />
 
       {error && !dismissedError && (
