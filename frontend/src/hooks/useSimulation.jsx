@@ -95,17 +95,20 @@ export function useSimulation() {
 
   // Load initial dashboard state
   useEffect(() => {
-    async function loadState() {
       try {
         const apiBase = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000";
-        const resp = await fetch(`${apiBase}/api/simulation/state`, {
+        const resp = await fetch(`${apiBase}/api/simulations/sph/summary`, {
           method: "GET",
           credentials: "omit",
         });
         if (resp.ok) {
           const data = await resp.json();
           if (data && typeof data === "object") {
-            setState(data);
+            setState((prev) => ({
+              ...prev,
+              current_simulation: data.simulation_id || "SPH-RISHIGANGA-001",
+              last_update: new Date().toISOString() + "Z",
+            }));
           }
         }
       } catch (e) {

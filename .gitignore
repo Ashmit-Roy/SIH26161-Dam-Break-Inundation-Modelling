@@ -1,4 +1,10 @@
-# Python & Node
+# Node
+node_modules/
+frontend/node_modules/
+package-lock.json
+*.aux.xml
+
+# Python
 __pycache__/
 *.py[cod]
 *$py.class

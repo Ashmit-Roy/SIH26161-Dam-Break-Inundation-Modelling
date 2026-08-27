@@ -125,10 +125,7 @@ function App() {
         endTime={simulationStatus.endTime}
       />
 
-      <DownloadSection
-        currentResult={currentResult}
-        comparison={comparison}
-        simulationId={state?.current_simulation}
+        simulationId={state?.current_simulation || "SPH-RISHIGANGA-001"}
       />
 
       {error && !dismissedError && (
