@@ -47,7 +47,7 @@ function SimulationControls(
           <label htmlFor="model">Model</label>
           <select>
             <option value="SPH">SPH (Smoothed Particle Hydrodynamics)</option>
-            <option value="Delft3D">Delft3D / Delft3D FM</option>
+            <option value="HEC-RAS">HEC-RAS 2D (Unsteady Mesh)</option>
           </select>
         </div>
 

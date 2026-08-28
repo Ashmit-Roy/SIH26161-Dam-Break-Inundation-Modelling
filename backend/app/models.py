@@ -7,6 +7,9 @@ from pydantic import BaseModel, Field
 class ModelType(str, Enum):
     SPH = "SPH"
     HECRAS = "HEC-RAS"
+    HECRAS_2D = "HEC-RAS 2D"
+    DELFT3D = "Delft3D"
+    BOTH = "both"
 
 
 class ComparisonMetric(str, Enum):

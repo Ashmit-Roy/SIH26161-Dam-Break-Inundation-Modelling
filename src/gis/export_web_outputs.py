@@ -71,21 +71,23 @@ def create_study_area_vectors(
     gdf_dams = gpd.GeoDataFrame(dams, crs="EPSG:4326")
 
     # 2. River Centerline
-    # Originates at glacier snout (79.74, 30.46) -> Rishiganga (79.688, 30.485) -> Raini confluence (79.655, 30.491)
-    # -> Tapovan Barrage (79.621, 30.495) -> Dhak (79.585, 30.520) -> Joshimath/Helang (79.525, 30.550)
+    # Originates at glacier snout (79.720, 30.467) -> Rishiganga Dam (79.686, 30.482) -> Raini confluence (79.663, 30.490)
+    # -> Tapoban Barrage (79.626, 30.496) -> Chamtoli (79.615, 30.502) -> Dhak (79.585, 30.532) -> Joshimath/Helang (79.565, 30.556)
     river_coords = [
-        (79.7450, 30.4620),
-        (79.7150, 30.4730),
-        (79.6880, 30.4850),  # Rishiganga Dam
-        (79.6650, 30.4890),
-        (79.6550, 30.4910),  # Raini Confluence
-        (79.6380, 30.4930),
-        (79.6210, 30.4950),  # Tapovan Barrage
-        (79.6050, 30.5050),
-        (79.5850, 30.5200),  # Dhak
-        (79.5600, 30.5350),
-        (79.5400, 30.5420),
-        (79.5250, 30.5500),  # Joshimath / Helang Confluence
+        (79.7200, 30.4670),  # Upper Rishi Ganga Gorge (Paing / Murunna Origin)
+        (79.7100, 30.4720),
+        (79.6980, 30.4760),
+        (79.6860, 30.4820),  # Rishiganga Dam
+        (79.6740, 30.4860),
+        (79.6630, 30.4900),  # Raini Confluence
+        (79.6500, 30.4920),
+        (79.6380, 30.4940),
+        (79.6260, 30.4960),  # Tapoban Barrage
+        (79.6100, 30.5020),  # Chamtoli Dhauliganga Reach
+        (79.5950, 30.5150),  # Tugasi / Ringi Valley Floor
+        (79.5850, 30.5280),  # Mirag / Kharori River Corridor
+        (79.5750, 30.5400),  # Dhak / Oucha Valley Channel
+        (79.5650, 30.5560),  # Vishnuprayag Alaknanda Confluence
     ]
     river_geom = LineString(river_coords)
     gdf_river = gpd.GeoDataFrame(
@@ -136,7 +138,7 @@ def create_study_area_vectors(
             "name": "Helang Alaknanda Road Junction",
             "type": "National Highway Infrastructure",
             "vulnerability": "Moderate",
-            "geometry": Point(79.5240, 30.5510),
+            "geometry": Point(79.5650, 30.5560),
         },
     ]
     gdf_infra = gpd.GeoDataFrame(infra, crs="EPSG:4326")

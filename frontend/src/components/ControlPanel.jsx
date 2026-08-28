@@ -55,7 +55,7 @@ function ControlPanel({
             className="modern-select"
           >
             <option value="SPH">💧 3D SPH (DualSPHysics Particle Navier-Stokes)</option>
-            <option value="Delft3D">🌊 2D HEC-RAS / Delft3D (Shallow Water SWE)</option>
+            <option value="HEC-RAS">🌊 2D HEC-RAS (Unsteady Flow Mesh)</option>
             <option value="both">⚡ Dual-Model Comparison (3D SPH vs 2D HEC-RAS)</option>
           </select>
         </div>
@@ -118,16 +118,23 @@ function ControlPanel({
           />
         </div>
 
-        {/* Live Hydrodynamic Estimation Preview */}
-        <div className="hydro-preview-card">
-          <div className="hydro-preview-title">⚡ Real-Time Physics Estimate</div>
-          <div className="hydro-preview-row">
-            <span>Peak Breach Discharge (Q_p):</span>
-            <strong>{estDischarge.toLocaleString()} m³/s</strong>
+        {/* Live Hydrodynamic Estimation & Landmark Context */}
+        <div className="hydro-preview-card" style={{ background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)", border: "1px solid rgba(56, 189, 248, 0.3)", borderRadius: "8px", padding: "12px 14px", marginTop: "14px" }}>
+          <div className="hydro-preview-title" style={{ fontSize: "0.78rem", color: "#38bdf8", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "6px" }}>
+            📍 Affected Landmark & Reach Context
           </div>
-          <div className="hydro-preview-row">
-            <span>Spatial Reference:</span>
-            <code>EPSG:32644 (UTM 44N)</code>
+          <div style={{ fontSize: "0.82rem", color: "#f8fafc", marginBottom: "4px" }}>
+            • <strong>Target Reach:</strong> Rishiganga Canyon → Reni Confluence
+          </div>
+          <div style={{ fontSize: "0.82rem", color: "#f8fafc", marginBottom: "4px" }}>
+            • <strong>Critical Structures:</strong> Reni Suspension Bridge, Tapovan Hydro Project
+          </div>
+          <div style={{ fontSize: "0.82rem", color: "#f8fafc", marginBottom: "8px" }}>
+            • <strong>Valley Gravity Drop:</strong> 374 meters over 3.6 km canyon
+          </div>
+          <div className="hydro-preview-row" style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "6px", fontSize: "0.8rem", color: "#cbd5e1" }}>
+            <span>Est. Peak Discharge (Q_p):</span>
+            <strong style={{ color: "#ef4444" }}>{estDischarge.toLocaleString()} m³/s</strong>
           </div>
         </div>
 

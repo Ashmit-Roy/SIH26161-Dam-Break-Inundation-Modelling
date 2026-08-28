@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import math
 import uuid
 from typing import Any, Dict, Optional
 
@@ -189,19 +190,28 @@ class MockDelft3DExecution:
         w = float(request.breach_width or 15.0)
         h = float(request.breach_height or 3.0)
         
+        # Reach topography parameters
+        reach_profiles = {
+            "rishiganga": {"name": "Rishiganga Gorge (Uttarakhand)", "lat": 30.485, "lon": 79.712, "delta_z": 374.0, "len_m": 3600.0, "q_factor": 1.45},
+            "chamoli": {"name": "Dhauliganga - Chamoli Reach", "lat": 30.550, "lon": 79.620, "delta_z": 180.0, "len_m": 14500.0, "q_factor": 1.25},
+            "tehri": {"name": "Tehri Dam Reach (Bhagirathi)", "lat": 30.378, "lon": 78.480, "delta_z": 260.0, "len_m": 28000.0, "q_factor": 1.15},
+            "mullaperiyar": {"name": "Periyar River Basin Reach", "lat": 9.529, "lon": 77.142, "delta_z": 155.0, "len_m": 18200.0, "q_factor": 1.10},
+        }
+        reach_key = str(getattr(request, "river_dam", "rishiganga") or "rishiganga").lower()
+        reach = reach_profiles.get(reach_key, reach_profiles["rishiganga"])
+
         # 2D Shallow Water with Manning's roughness n=0.045
-        # Lower velocity due to boundary friction, slightly higher depth
         g = 9.81
-        q_peak_2d = round(0.607 * math.sqrt(g) * w * (h ** 1.5) * 1.15, 1)
-        peak_vel_2d = round(28.5 + (w * 0.4) + (h * 1.2), 2)
-        arrival_s_2d = round(3600.0 / (peak_vel_2d * 0.6), 1)
+        q_peak_2d = round(0.607 * math.sqrt(g) * w * (h ** 1.5) * reach["q_factor"], 1)
+        peak_vel_2d = round(24.5 + (w * 0.35) + (h * 1.1), 2)
+        arrival_s_2d = round(reach["len_m"] / (peak_vel_2d * 0.6), 1)
         water_depth_2d = round(h * 0.95 + (w / 18.0), 2)
         flood_area_2d = round(0.55 + (w * h * 0.024), 2)
         pop_affected_2d = int(720 + (w * h * 48))
 
         water_depth = WaterDepthResult(
             simulation_id=request.simulation_id,
-            location={"lat": 30.485, "lon": 79.712},
+            location={"lat": reach["lat"], "lon": reach["lon"]},
             water_depth=water_depth_2d,
             timestamp=datetime.datetime.utcnow().isoformat() + "Z",
         )
@@ -212,11 +222,11 @@ class MockDelft3DExecution:
                 "type": "Polygon",
                 "coordinates": [
                     [
-                        [30.470, 79.692],
-                        [30.498, 79.700],
-                        [30.515, 79.732],
-                        [30.485, 79.740],
-                        [30.470, 79.692],
+                        [reach["lat"] - 0.015, reach["lon"] - 0.020],
+                        [reach["lat"] + 0.015, reach["lon"] - 0.010],
+                        [reach["lat"] + 0.030, reach["lon"] + 0.020],
+                        [reach["lat"] + 0.005, reach["lon"] + 0.025],
+                        [reach["lat"] - 0.015, reach["lon"] - 0.020],
                     ]
                 ],
             },
@@ -224,8 +234,8 @@ class MockDelft3DExecution:
         )
 
         metadata = SimulationMetadata(
-            terrain_reference="DEM: CartoDEM 2m / HEC-RAS 2D Mesh",
-            dam_location={"lat": 30.485, "lon": 79.712},
+            terrain_reference=f"DEM: CartoDEM 30m / HEC-RAS 2D Mesh ({reach['name']})",
+            dam_location={"lat": reach["lat"], "lon": reach["lon"]},
             initial_water_level=water_depth_2d,
         )
 
@@ -233,8 +243,8 @@ class MockDelft3DExecution:
             "water_depth": water_depth,
             "flood_extent": flood_extent,
             "metadata": metadata,
-            "model": "HEC-RAS / Delft3D 2D",
-            "source": "2D Shallow Water Equations (SWE)",
+            "model": "HEC-RAS 2D",
+            "source": "2D Shallow Water Finite Volume Mesh (HEC-RAS)",
             "peak_velocity_mps": peak_vel_2d,
             "arrival_time_s": arrival_s_2d,
             "peak_discharge_m3s": q_peak_2d,
@@ -262,9 +272,9 @@ class SimulationService:
         if not request.simulation_id or not request.simulation_id.strip():
             raise ValueError("simulation_id is required")
 
-        if request.model not in [ModelType.SPH, ModelType.HECRAS]:
+        if request.model not in [ModelType.SPH, ModelType.HECRAS, ModelType.HECRAS_2D, ModelType.DELFT3D, ModelType.BOTH]:
             raise ValueError(
-                f"Invalid model type: {request.model}. Must be SPH or HEC-RAS."
+                f"Invalid model type: {request.model}. Must be SPH, HEC-RAS, Delft3D, or both."
             )
 
         if not request.scenario_id or not request.scenario_id.strip():
@@ -351,21 +361,21 @@ class SimulationService:
         model = ModelType(state["model"])
 
         # Execute appropriate mock model
-        if model == ModelType.SPH:
-            result_data = await MockSPHExecution.execute(
+        if model in [ModelType.HECRAS, ModelType.HECRAS_2D, ModelType.DELFT3D, ModelType.BOTH]:
+            result_data = await MockDelft3DExecution.execute(
                 SimulationRequest(
                     simulation_id=simulation_id,
-                    model=ModelType.SPH,
+                    model=model,
                     scenario_id=state["scenario_id"],
                     breach_width=state["breach_width"],
                     breach_height=state["breach_height"],
                 )
             )
-        elif model == ModelType.DELFT3D:
-            result_data = await MockDelft3DExecution.execute(
+        elif model == ModelType.SPH:
+            result_data = await MockSPHExecution.execute(
                 SimulationRequest(
                     simulation_id=simulation_id,
-                    model=ModelType.DELFT3D,
+                    model=ModelType.SPH,
                     scenario_id=state["scenario_id"],
                     breach_width=state["breach_width"],
                     breach_height=state["breach_height"],

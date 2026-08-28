@@ -218,6 +218,15 @@ export function useSimulation() {
 
       setForm((prev) => {
         const next = { ...prev, [fieldName]: parsedValue };
+        if (fieldName === "model") {
+          if (parsedValue === "Delft3D" || parsedValue === "HEC-RAS") {
+            next.simulation_id = `HECRAS-2D-${Date.now().toString(36).slice(-4).toUpperCase()}`;
+          } else if (parsedValue === "both") {
+            next.simulation_id = `DUAL-SCALE-${Date.now().toString(36).slice(-4).toUpperCase()}`;
+          } else {
+            next.simulation_id = `SPH-RISHIGANGA-001`;
+          }
+        }
         if (fieldName === "scenario_id") {
           const sc = DEMO_SCENARIOS.find((s) => s.id === parsedValue);
           if (sc) {
@@ -244,9 +253,14 @@ export function useSimulation() {
       ? formValuesOrEvent 
       : form;
 
+    const simIdPrefix = (values.model === "Delft3D" || values.model === "HEC-RAS")
+      ? "HECRAS-2D"
+      : (values.model === "both" ? "DUAL-SCALE" : "SPH-SIM");
+    const uniqueSimId = `${simIdPrefix}-${Date.now().toString(36).toUpperCase()}`;
+
     const payload = {
       ...values,
-      simulation_id: values.simulation_id?.trim() || `sim_${Date.now().toString(36)}`,
+      simulation_id: uniqueSimId,
       model: values.model || ModelType.SPH,
       scenario_id: values.scenario_id || "scenario_a",
       breach_width: Number(values.breach_width) || 10.0,
