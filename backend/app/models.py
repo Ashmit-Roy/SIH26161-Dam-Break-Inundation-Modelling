@@ -30,12 +30,15 @@ class SimulationStatus(str, Enum):
 # Request/Response Models
 
 class SimulationRequest(BaseModel):
-    simulation_id: str = Field(..., description="Unique simulation identifier")
-    model: ModelType = Field(..., description="Hydraulic model: SPH or HEC-RAS")
-    scenario_id: str = Field(..., description="Scenario identifier")
-    breach_width: Optional[float] = Field(None, description="Breach width in meters")
-    breach_height: Optional[float] = Field(None, description="Breach height in meters")
-    simulation_time: Optional[float] = Field(None, description="Simulation time in seconds")
+    simulation_id: Optional[str] = Field(None, description="Unique simulation identifier")
+    model: Optional[ModelType] = Field(ModelType.SPH, description="Hydraulic model: SPH or HEC-RAS")
+    model_type: Optional[str] = Field(None, description="Model type alias string")
+    scenario_id: Optional[str] = Field("scenario_a", description="Scenario identifier")
+    river_dam: Optional[str] = Field("rishiganga", description="River or dam reach key (rishiganga, chamoli, tehri, mullaperiyar)")
+    breach_width: Optional[float] = Field(15.0, description="Breach width in meters")
+    breach_height: Optional[float] = Field(3.0, description="Breach height in meters")
+    simulation_time: Optional[float] = Field(60.0, description="Simulation time in seconds")
+    simulation_time_min: Optional[float] = Field(None, description="Simulation time in minutes")
     crs: Optional[str] = Field("EPSG:4326", description="Coordinate reference system")
 
 
@@ -143,6 +146,12 @@ class SimulationStatusResponse(BaseModel):
     )
     updated_at: str = Field(
         ..., description="ISO8601 timestamp of last update"
+    )
+    result_summary: Optional[Dict[str, Any]] = Field(
+        None, description="Computed hydrodynamic physics summary (Peak Velocity, Discharge, PAR)"
+    )
+    result_url: Optional[str] = Field(
+        None, description="Direct URL to fetch full GeoJSON polygon & SPH results"
     )
 
 

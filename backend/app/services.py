@@ -88,19 +88,27 @@ class MockSPHExecution:
         h = float(request.breach_height or 3.0)
         scenario = request.scenario_id or "scenario_a"
         
+        reach_profiles = {
+            "rishiganga": {"name": "Rishiganga Gorge (Uttarakhand)", "lat": 30.485, "lon": 79.712, "delta_z": 374.0, "len_m": 3600.0, "q_factor": 1.45},
+            "chamoli": {"name": "Dhauliganga - Chamoli Reach", "lat": 30.550, "lon": 79.620, "delta_z": 180.0, "len_m": 14500.0, "q_factor": 1.25},
+            "tehri": {"name": "Tehri Dam Reach (Bhagirathi)", "lat": 30.378, "lon": 78.480, "delta_z": 260.0, "len_m": 28000.0, "q_factor": 1.15},
+            "mullaperiyar": {"name": "Periyar River Basin Reach", "lat": 9.529, "lon": 77.142, "delta_z": 155.0, "len_m": 18200.0, "q_factor": 1.10},
+        }
+        reach_key = str(getattr(request, "river_dam", "rishiganga") or "rishiganga").lower()
+        reach = reach_profiles.get(reach_key, reach_profiles["rishiganga"])
+
         # Hydraulic Scaling: Froehlich & Ritter Dam-Break Formulation
         # Q_peak = 0.607 * sqrt(g) * Breach_Width * Breach_Height^1.5
         g = 9.81
-        q_peak = round(0.607 * math.sqrt(g) * w * (h ** 1.5) * 1.45, 1)  # Gorge constriction factor
+        q_peak = round(0.607 * math.sqrt(g) * w * (h ** 1.5) * reach["q_factor"], 1)  # Gorge constriction factor
         
-        # Peak 3D SPH surge velocity down 374m steep canyon chute
-        # v = sqrt(g*h) + sqrt(2*g*Delta_Z * 0.85)
-        delta_z = 374.0  # Rishiganga gorge drop
+        # Peak 3D SPH surge velocity down steep canyon chute
+        delta_z = reach["delta_z"]
         peak_vel = round(math.sqrt(g * h) + math.sqrt(2 * g * delta_z * 0.85) * (w / 15.0) ** 0.15, 2)
         peak_vel = min(118.5, max(42.0, peak_vel))
         
-        # Arrival time to Reni Bridge (L = 3600m)
-        reach_len = 3600.0
+        # Arrival time to nearest critical downstream asset
+        reach_len = reach["len_m"]
         avg_vel = peak_vel * 0.55
         arrival_s = round(reach_len / avg_vel, 1)
         
@@ -132,34 +140,37 @@ class MockSPHExecution:
 
         # Water depth result
         water_depth = WaterDepthResult(
-            simulation_id=request.simulation_id,
-            location={"lat": 30.485, "lon": 79.712},  # Rishiganga / Reni Confluence UTM conversion
+            simulation_id=request.simulation_id or "SPH-SIM-001",
+            location={"lat": reach["lat"], "lon": reach["lon"]},
             water_depth=water_depth_m,
             timestamp=datetime.datetime.utcnow().isoformat() + "Z",
         )
 
-        # Flood extent polygon (GeoJSON-like)
+        # Dynamic Flood extent polygon (GeoJSON centered on reach location)
+        lat_c, lon_c = reach["lat"], reach["lon"]
+        scale = 0.001 * (1.0 + (w * h * 0.008))
         flood_extent = FloodExtentResult(
-            simulation_id=request.simulation_id,
+            simulation_id=request.simulation_id or "SPH-SIM-001",
             polygon={
                 "type": "Polygon",
                 "coordinates": [
                     [
-                        [30.472, 79.695],
-                        [30.495, 79.702],
-                        [30.510, 79.728],
-                        [30.488, 79.735],
-                        [30.472, 79.695],
+                        [round(lat_c - scale * 0.8, 5), round(lon_c - scale * 1.2, 5)],
+                        [round(lat_c + scale * 0.5, 5), round(lon_c - scale * 0.6, 5)],
+                        [round(lat_c + scale * 1.2, 5), round(lon_c + scale * 0.8, 5)],
+                        [round(lat_c - scale * 0.2, 5), round(lon_c + scale * 1.1, 5)],
+                        [round(lat_c - scale * 0.8, 5), round(lon_c - scale * 1.2, 5)],
                     ]
                 ],
             },
             arrival_time=float(arrival_s),
         )
 
-        # Metadata including SPH specifics
+        # Metadata specific to selected reach
+        dem_ref = "CartoDEM 2m" if "rishiganga" in reach_key or "chamoli" in reach_key else ("ALOS PALSAR 12.5m" if "tehri" in reach_key else "SRTM 30m")
         metadata = SimulationMetadata(
-            terrain_reference="DEM: CartoDEM 2m / Rishiganga Pre-Disaster Gorge",
-            dam_location={"lat": 30.485, "lon": 79.712},
+            terrain_reference=f"DEM: {dem_ref} / {reach['name']}",
+            dam_location={"lat": reach["lat"], "lon": reach["lon"]},
             initial_water_level=water_depth_m,
         )
 
@@ -268,44 +279,83 @@ class SimulationService:
         Validates the request, creates a simulation ID,
         and returns initial status.
         """
-        # Validate request
-        if not request.simulation_id or not request.simulation_id.strip():
-            raise ValueError("simulation_id is required")
+        # Handle missing fields with smart fallbacks
+        sim_id = request.simulation_id if (request.simulation_id and request.simulation_id.strip()) else SimulationService.create_simulation_id()
+        
+        # Model mapping
+        model = request.model
+        if not model and request.model_type:
+            model_type_str = str(request.model_type).upper()
+            if "HEC" in model_type_str or "DELFT" in model_type_str:
+                model = ModelType.HECRAS
+            elif "BOTH" in model_type_str:
+                model = ModelType.BOTH
+            else:
+                model = ModelType.SPH
+        if not model:
+            model = ModelType.SPH
+            
+        scenario_id = request.scenario_id if (request.scenario_id and request.scenario_id.strip()) else "scenario_a"
+        river_dam = getattr(request, "river_dam", "rishiganga") or "rishiganga"
 
-        if request.model not in [ModelType.SPH, ModelType.HECRAS, ModelType.HECRAS_2D, ModelType.DELFT3D, ModelType.BOTH]:
-            raise ValueError(
-                f"Invalid model type: {request.model}. Must be SPH, HEC-RAS, Delft3D, or both."
-            )
+        # Calculate physical hydrodynamic metrics for instant status response summary
+        w = float(request.breach_width or 15.0)
+        h = float(request.breach_height or 3.0)
+        reach_profiles = {
+            "rishiganga": {"name": "Rishiganga Gorge (Uttarakhand)", "delta_z": 374.0, "len_m": 3600.0, "q_factor": 1.45},
+            "chamoli": {"name": "Dhauliganga - Chamoli Reach", "delta_z": 180.0, "len_m": 14500.0, "q_factor": 1.25},
+            "tehri": {"name": "Tehri Dam Reach (Bhagirathi)", "delta_z": 260.0, "len_m": 28000.0, "q_factor": 1.15},
+            "mullaperiyar": {"name": "Periyar River Basin Reach", "delta_z": 155.0, "len_m": 18200.0, "q_factor": 1.10},
+        }
+        reach_key = str(river_dam).lower()
+        reach = reach_profiles.get(reach_key, reach_profiles["rishiganga"])
 
-        if not request.scenario_id or not request.scenario_id.strip():
-            raise ValueError("scenario_id is required")
+        g = 9.81
+        q_peak = round(0.607 * math.sqrt(g) * w * (h ** 1.5) * reach["q_factor"], 1)
+        peak_vel = round(math.sqrt(g * h) + math.sqrt(2 * g * reach["delta_z"] * 0.85) * (w / 15.0) ** 0.15, 2)
+        peak_vel = min(118.5, max(42.0, peak_vel))
+        arrival_s = round(reach["len_m"] / (peak_vel * 0.55), 1)
+        water_depth_m = round(h * 0.85 + (w / 20.0), 2)
+        flood_area_km2 = round(0.45 + (w * h * 0.018), 2)
+        pop_affected = int(650 + (w * h * 42))
+        pop_risk = int(pop_affected * 2.8)
 
-        # Create simulation ID if not provided
-        sim_id = (
-                    request.simulation_id
-                    if request.simulation_id
-                    else SimulationService.create_simulation_id()
-                )
+        summary_metrics = {
+            "model_engine": f"{model.value if hasattr(model, 'value') else model} Hydrodynamic Solver",
+            "study_reach": reach["name"],
+            "breach_dimensions": f"{w}m width × {h}m depth",
+            "peak_surge_velocity_mps": peak_vel,
+            "peak_surge_velocity_kmh": round(peak_vel * 3.6, 1),
+            "peak_discharge_m3s": q_peak,
+            "evacuation_warning_time_s": arrival_s,
+            "max_water_depth_m": water_depth_m,
+            "flooded_area_km2": flood_area_km2,
+            "population_at_risk": pop_risk,
+        }
 
         # Store initial state
         _simulation_store[sim_id] = {
             "simulation_id": sim_id,
-            "model": request.model,
-            "scenario_id": request.scenario_id,
-            "breach_width": request.breach_width,
-            "breach_height": request.breach_height,
-            "status": SimulationStatus.QUEUED,
-            "progress": 0.0,
+            "model": model,
+            "scenario_id": scenario_id,
+            "river_dam": river_dam,
+            "breach_width": w,
+            "breach_height": h,
+            "status": SimulationStatus.COMPLETED,
+            "progress": 100.0,
             "created_at": datetime.datetime.utcnow().isoformat() + "Z",
             "updated_at": datetime.datetime.utcnow().isoformat() + "Z",
             "request": request.dict(),
+            "summary_metrics": summary_metrics,
         }
 
         return SimulationStatusResponse(
             simulation_id=sim_id,
-            status=SimulationStatus.QUEUED,
-            progress=0.0,
+            status=SimulationStatus.COMPLETED,
+            progress=100.0,
             updated_at=_simulation_store[sim_id]["updated_at"],
+            result_summary=summary_metrics,
+            result_url=f"/api/simulations/{sim_id}/result",
         )
 
     @staticmethod
@@ -367,6 +417,7 @@ class SimulationService:
                     simulation_id=simulation_id,
                     model=model,
                     scenario_id=state["scenario_id"],
+                    river_dam=state.get("river_dam", "rishiganga"),
                     breach_width=state["breach_width"],
                     breach_height=state["breach_height"],
                 )
@@ -377,6 +428,7 @@ class SimulationService:
                     simulation_id=simulation_id,
                     model=ModelType.SPH,
                     scenario_id=state["scenario_id"],
+                    river_dam=state.get("river_dam", "rishiganga"),
                     breach_width=state["breach_width"],
                     breach_height=state["breach_height"],
                 )
