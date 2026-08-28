@@ -50,14 +50,14 @@ function StatisticsPanel() {
       {/* Comparison Section */}
       {comparison && (
         <div className="comparison-box">
-          <h3>SPH vs Delft3D Comparison</h3>
+          <h3>SPH vs HEC-RAS 2D Comparison</h3>
           <p>
-            <b>SPH:</b> {comparison.sph_data?.water_depth ?? "N/A"} m &nbsp;|&nbsp;
-            <b>Delft3D:</b> {comparison.delft3d_data?.water_depth ?? "N/A"} m
+            <b>SPH (3D):</b> {comparison.sph_data?.water_depth ?? "N/A"} m &nbsp;|&nbsp;
+            <b>HEC-RAS (2D):</b> {(comparison.hecras_data?.water_depth ?? comparison.delft3d_data?.water_depth) ?? "N/A"} m
           </p>
           <p>
-            <b>Difference:</b> {(
-              (comparison.delft3d_data?.water_depth ?? 0) -
+            <b>Depth Δ:</b> {(
+              ((comparison.hecras_data?.water_depth ?? comparison.delft3d_data?.water_depth) ?? 0) -
               (comparison.sph_data?.water_depth ?? 0)
             ).toFixed(3)} m
           </p>

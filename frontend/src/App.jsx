@@ -111,6 +111,7 @@ function App() {
             />
             <ComparisonPanel
               comparison={comparison}
+              currentResult={currentResult}
               ModelType={ModelType}
             />
           </div>
@@ -118,9 +119,9 @@ function App() {
       </div>
 
       <StatusBar
-        stage={simulationStatus.stage}
-        message={simulationStatus.message}
-        model={simulationStatus.model}
+        stage={isRunning ? "running" : "completed"}
+        message={isRunning ? "Running hydrodynamic solver simulation..." : "Hydrodynamic simulation ready — Models loaded"}
+        model={form.model || "SPH"}
         startTime={simulationStatus.startTime}
         endTime={simulationStatus.endTime}
       />
