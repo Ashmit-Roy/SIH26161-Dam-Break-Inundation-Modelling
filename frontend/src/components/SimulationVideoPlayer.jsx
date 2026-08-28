@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 
 function SimulationVideoPlayer({
-  videoSrc = "/api/simulations/sph/video",
+  videoSrc = "/sph_simulation.mp4",
   currentTime = 0,
   onTimeChange = null,
   peakVelocity = 102.37,
@@ -10,7 +10,7 @@ function SimulationVideoPlayer({
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackTime, setPlaybackTime] = useState(currentTime || 0);
   const [speed, setSpeed] = useState(1);
-  const [renderMode, setRenderMode] = useState("canvas"); // "canvas" or "video"
+  const [renderMode, setRenderMode] = useState("video"); // "video" (ParaView MP4) or "canvas" (3D Particle Canvas)
   const [videoError, setVideoError] = useState(false);
   const canvasRef = useRef(null);
   const videoRef = useRef(null);
@@ -136,10 +136,10 @@ function SimulationVideoPlayer({
     }
   }, [playbackTime, renderMode]);
 
-  // Timer loop for playback
+  // Timer loop for playback (when canvas mode is active)
   useEffect(() => {
     let interval = null;
-    if (isPlaying) {
+    if (isPlaying && renderMode === "canvas") {
       interval = setInterval(() => {
         setPlaybackTime((prev) => {
           const next = prev + 0.5 * speed;
@@ -153,13 +153,42 @@ function SimulationVideoPlayer({
       }, 100);
     }
     return () => clearInterval(interval);
-  }, [isPlaying, speed, onTimeChange]);
+  }, [isPlaying, speed, onTimeChange, renderMode]);
 
   const handleSeek = (e) => {
     const newTime = parseFloat(e.target.value);
     setPlaybackTime(newTime);
+    if (renderMode === "video" && videoRef.current) {
+      videoRef.current.currentTime = newTime;
+    }
     if (onTimeChange) onTimeChange(Math.round(newTime));
   };
+
+  const handleTogglePlay = () => {
+    if (renderMode === "video" && videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play().catch(() => {});
+      }
+    } else {
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleSpeedChange = (newSpeed) => {
+    setSpeed(newSpeed);
+    if (videoRef.current) {
+      videoRef.current.playbackRate = newSpeed;
+    }
+  };
+
+  // Keep video playbackRate synchronized with speed state
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = speed;
+    }
+  }, [speed, renderMode]);
 
   const currentVel = getCurrentVelocity(playbackTime);
   const activeParticles = getActiveParticles(playbackTime);
@@ -178,34 +207,36 @@ function SimulationVideoPlayer({
 
         <div style={{ display: "flex", gap: "6px" }}>
           <button
+            onClick={() => { setRenderMode("video"); setVideoError(false); }}
+            style={{
+              background: renderMode === "video" ? "#e94560" : "#334155",
+              color: "#fff",
+              border: "none",
+              borderRadius: "4px",
+              padding: "4px 10px",
+              fontSize: "0.75rem",
+              cursor: "pointer",
+              fontWeight: "bold",
+              boxShadow: renderMode === "video" ? "0 0 8px rgba(233,69,96,0.6)" : "none",
+            }}
+          >
+            🎥 ParaView MP4
+          </button>
+          <button
             onClick={() => setRenderMode("canvas")}
             style={{
               background: renderMode === "canvas" ? "#e94560" : "#334155",
               color: "#fff",
               border: "none",
               borderRadius: "4px",
-              padding: "4px 8px",
+              padding: "4px 10px",
               fontSize: "0.75rem",
               cursor: "pointer",
               fontWeight: "bold",
+              boxShadow: renderMode === "canvas" ? "0 0 8px rgba(233,69,96,0.6)" : "none",
             }}
           >
-            3D Particle Canvas
-          </button>
-          <button
-            onClick={() => setRenderMode("video")}
-            style={{
-              background: renderMode === "video" ? "#e94560" : "#334155",
-              color: "#fff",
-              border: "none",
-              borderRadius: "4px",
-              padding: "4px 8px",
-              fontSize: "0.75rem",
-              cursor: "pointer",
-              fontWeight: "bold",
-            }}
-          >
-            ParaView MP4
+            ⚡ 3D Particle Canvas
           </button>
         </div>
       </div>
@@ -220,20 +251,30 @@ function SimulationVideoPlayer({
             style={{ width: "100%", height: "100%", display: "block" }}
           />
         ) : (
-          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
             <video
               ref={videoRef}
-              src={videoSrc}
               controls
-              style={{ maxWidth: "100%", maxHeight: "100%" }}
+              autoPlay
+              muted
+              loop
+              playsInline
+              onTimeUpdate={(e) => setPlaybackTime(e.target.currentTime)}
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+              style={{ width: "100%", height: "100%", objectFit: "contain", background: "#000" }}
               onError={() => setVideoError(true)}
-            />
+            >
+              <source src="/sph_simulation.mp4" type="video/mp4" />
+              <source src="http://127.0.0.1:8000/api/simulations/sph/video" type="video/mp4" />
+              Your browser does not support HTML5 video playback.
+            </video>
             {videoError && (
-              <div style={{ position: "absolute", background: "rgba(15,23,42,0.85)", padding: "16px", borderRadius: "6px", textAlign: "center" }}>
-                <p style={{ margin: "0 0 8px 0", color: "#f87171" }}>ParaView MP4 stream ready in backend.</p>
+              <div style={{ position: "absolute", background: "rgba(15,23,42,0.9)", padding: "16px", borderRadius: "6px", textAlign: "center", border: "1px solid #e94560" }}>
+                <p style={{ margin: "0 0 8px 0", color: "#f87171", fontWeight: "bold" }}>ParaView MP4 Video Stream Ready.</p>
                 <button
                   onClick={() => setRenderMode("canvas")}
-                  style={{ background: "#e94560", color: "#fff", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}
+                  style={{ background: "#e94560", color: "#fff", border: "none", padding: "8px 14px", borderRadius: "4px", cursor: "pointer", fontWeight: "bold" }}
                 >
                   Switch to 3D Particle Live Simulation
                 </button>
@@ -295,7 +336,7 @@ function SimulationVideoPlayer({
       <div style={{ padding: "12px 16px", background: "#1e293b" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={handleTogglePlay}
             style={{
               background: isPlaying ? "#f59e0b" : "#e94560",
               color: "#fff",
@@ -341,7 +382,7 @@ function SimulationVideoPlayer({
             {[0.5, 1, 2].map((s) => (
               <button
                 key={`spd-${s}`}
-                onClick={() => setSpeed(s)}
+                onClick={() => handleSpeedChange(s)}
                 style={{
                   background: speed === s ? "#e94560" : "#334155",
                   color: "#fff",
