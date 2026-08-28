@@ -31,7 +31,7 @@ class SimulationStatus(str, Enum):
 
 class SimulationRequest(BaseModel):
     simulation_id: Optional[str] = Field(None, description="Unique simulation identifier")
-    model: Optional[ModelType] = Field(ModelType.SPH, description="Hydraulic model: SPH or HEC-RAS")
+    model: Optional[ModelType] = Field(None, description="Hydraulic model: SPH or HEC-RAS")
     model_type: Optional[str] = Field(None, description="Model type alias string")
     scenario_id: Optional[str] = Field("scenario_a", description="Scenario identifier")
     river_dam: Optional[str] = Field("rishiganga", description="River or dam reach key (rishiganga, chamoli, tehri, mullaperiyar)")

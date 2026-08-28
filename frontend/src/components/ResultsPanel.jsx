@@ -258,7 +258,12 @@ function ResultsPanel({
             {`${Math.floor(arrivalTimeS / 60)}m ${Math.round(arrivalTimeS % 60)}s`} <span style={{ fontSize: "0.78rem", fontWeight: "normal", color: "#fde68a" }}>({arrivalTimeS}s)</span>
           </div>
           <div style={{ fontSize: "0.72rem", color: "#94a3b8" }}>
-            To 📍 <strong>Reni Bridge & Confluence</strong>
+            To 📍 <strong>{
+              currentResult?.river_dam === "chamoli" ? "Pipalkoti Highway Bridge" :
+              currentResult?.river_dam === "tehri" ? "Koteshwar Head / Old Tehri" :
+              currentResult?.river_dam === "mullaperiyar" ? "Vandiperiyar Town Bridge" :
+              "Reni Bridge & Confluence"
+            }</strong>
           </div>
         </div>
 

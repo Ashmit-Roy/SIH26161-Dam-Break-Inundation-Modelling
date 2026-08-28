@@ -94,7 +94,9 @@ function MapDisplay({
       iconAnchor: [15, 15],
     });
 
-    const marker = L.marker([activeLat, activeLon], { icon: damIcon })
+    const initWaypoints = RIVER_CHANNELS[activeReachKey] || RIVER_CHANNELS.rishiganga;
+    const initOrigin = initWaypoints[0] || [activeLat, activeLon];
+    const marker = L.marker(initOrigin, { icon: damIcon })
       .addTo(map)
       .bindPopup(`<b>${currentResult?.reach_info?.name || "Rishiganga Dam Site"}</b><br/>Breach Location (UTM Zone 44N)<br/><i>Origin of Hydrodynamic Wave</i>`);
 
@@ -111,16 +113,19 @@ function MapDisplay({
     };
   }, []);
 
-  // Pan map when reach changes
+  // Pan map and position Breach Origin Marker precisely at start of flood channel
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
-    map.flyTo([activeLat, activeLon], activeZoom, { duration: 1.2 });
+    const waypoints = RIVER_CHANNELS[activeReachKey] || RIVER_CHANNELS.rishiganga;
+    const originPt = waypoints[0] || [activeLat, activeLon];
+
+    map.flyTo(originPt, activeZoom, { duration: 1.2 });
     if (damMarkerRef.current) {
-      damMarkerRef.current.setLatLng([activeLat, activeLon]);
-      damMarkerRef.current.bindPopup(`<b>${currentResult?.reach_info?.name || "Rishiganga Dam Site"}</b><br/>Breach Location (UTM 44N)<br/><i>Origin of Hydrodynamic Wave</i>`);
+      damMarkerRef.current.setLatLng(originPt);
+      damMarkerRef.current.bindPopup(`<b>${currentResult?.reach_info?.name || "Breach Origin Site"}</b><br/>Breach Location (UTM 44N)<br/><i>Origin of Hydrodynamic Wave Front</i>`);
     }
-  }, [activeLat, activeLon, activeZoom, currentResult?.reach_info?.name]);
+  }, [activeLat, activeLon, activeZoom, activeReachKey, currentResult?.reach_info?.name]);
 
   // Automatically reset timeline and play flood wave animation when simulation runs
   useEffect(() => {
@@ -237,7 +242,7 @@ function MapDisplay({
   const buildRiverCorridor = (reachKey, tMin, modelType, bufferScale = 1.0, wMeters = 15, hMeters = 3) => {
     const waypoints = RIVER_CHANNELS[reachKey] || RIVER_CHANNELS.rishiganga;
     const is2D = modelType === "HEC-RAS" || modelType === "both";
-    
+
     // Physical breach scaling factors
     const breachFactor = Math.pow(wMeters / 15.0, 0.45) * Math.pow(hMeters / 3.0, 0.35);
     const velocityFactor = Math.pow(wMeters / 15.0, 0.35) * Math.pow(hMeters / 3.0, 0.25);
@@ -396,7 +401,7 @@ function MapDisplay({
               <div style="font-size:0.8rem; color:#1e293b; line-height:1.35;">
                 <strong style="color:#ef4444;">💧 3D DualSPHysics Lagrangian Particle #${segIdx * 8 + p + 101}</strong><br/>
                 <b>Solver Architecture:</b> 3D Particle Navier-Stokes (Meshless)<br/>
-                <b>Particle Surge Speed (v):</b> <span style="color:#ef4444; font-weight:bold;">${particleVel} m/s</span> (${(Number(particleVel)*3.6).toFixed(0)} km/h)<br/>
+                <b>Particle Surge Speed (v):</b> <span style="color:#ef4444; font-weight:bold;">${particleVel} m/s</span> (${(Number(particleVel) * 3.6).toFixed(0)} km/h)<br/>
                 <b>Fluid Pressure (P):</b> ${(2.4 + velRatio * 4.1).toFixed(2)} kPa<br/>
                 <b>3D Elevation (Z):</b> ${(2050 - segIdx * 35).toFixed(0)}m ASL<br/>
                 <b>Physical Feature:</b> Non-hydrostatic 3D canyon splash & wall impact
@@ -482,7 +487,7 @@ function MapDisplay({
       };
       const sarLimit = SAR_LIMITS[activeReachKey] || Math.ceil(activeWaypoints.length * 0.6);
       const sarWaypoints = activeWaypoints.slice(0, Math.min(sarLimit, activeWaypoints.length));
-      
+
       // Build observed satellite footprint buffer
       const leftBank = [];
       const rightBank = [];
@@ -535,7 +540,7 @@ function MapDisplay({
         if (markerItem) {
           try {
             map.removeLayer(markerItem);
-          } catch (e) {}
+          } catch (e) { }
         }
       });
     }
@@ -567,7 +572,7 @@ function MapDisplay({
           <span style={{ color: "#ff6b00", fontWeight: 800, fontSize: "0.9rem" }}>🗺️ VIEWPORT:</span>
           <span style={{ color: "#f8fafc", fontSize: "0.85rem", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" }}>TOPOGRAPHIC INUNDATION MESH</span>
         </div>
-        
+
         {/* GIS Layer Toggles */}
         <div style={{ display: "flex", gap: "10px" }}>
           <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.75rem", color: "#cbd5e1", background: "#0f172a", border: "1px solid #31394d", padding: "3px 8px", borderRadius: "3px", cursor: "pointer", fontFamily: "'JetBrains Mono', monospace" }}>
@@ -600,7 +605,7 @@ function MapDisplay({
       {/* Full-Bleed Map Viewport Container with Floating Hero Metrics HUD */}
       <div style={{ position: "relative", width: "100%", height: "520px", borderRadius: "8px", overflow: "hidden", border: "1px solid #31394d" }}>
         <div className="map-canvas" ref={mapContainerRef} style={{ height: "520px", width: "100%" }} />
-        
+
         {/* 🔥 Hero Metrics Card (Top Right HUD for Judges) */}
         <div style={{
           position: "absolute",

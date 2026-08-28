@@ -45,6 +45,12 @@ async def get_sph_simulation_summary():
     return await SimulationService.get_sph_summary()
 
 
+@router.get("/simulations/hecras/summary")
+async def get_hecras_simulation_summary():
+    """Get the full 2D HEC-RAS / Delft3D FM mesh simulation summary & hydrograph metrics."""
+    return await SimulationService.get_hecras_summary()
+
+
 @router.get("/simulations/sph/video")
 async def get_sph_simulation_video():
     """Stream or retrieve ParaView 3D particle simulation video playback."""
