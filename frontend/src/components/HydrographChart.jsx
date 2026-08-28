@@ -32,23 +32,12 @@ const DEFAULT_SPH_TIME_SERIES = [
   { time_s: 61.0, particle_count: 61, max_velocity_mps: 0.0, mean_velocity_mps: 0.0, front_position_x_local_m: 0.0 },
 ];
 
-function HydrographChart({ timeSeries, peakVelocity = 102.37, activeTimeStep = 12, onSelectTime = null }) {
+function HydrographChart({ timeSeries, peakVelocity = 89.1, arrivalTime = 18.0, peakDischarge = 1420, activeTimeStep = 12, onSelectTime = null }) {
   const [hoveredPoint, setHoveredPoint] = useState(null);
   const [showMean, setShowMean] = useState(true);
 
-  const data = useMemo(() => {
-    const base = (Array.isArray(timeSeries) && timeSeries.length > 0)
-      ? timeSeries
-      : DEFAULT_SPH_TIME_SERIES;
-    
-    // Scale velocities relative to peakVelocity
-    const scaleFactor = (peakVelocity || 102.37) / 102.37;
-    return base.map((pt) => ({
-      ...pt,
-      max_velocity_mps: Number((pt.max_velocity_mps * scaleFactor).toFixed(2)),
-      mean_velocity_mps: Number((pt.mean_velocity_mps * scaleFactor).toFixed(2)),
-    }));
-  }, [timeSeries, peakVelocity]);
+  const warnTimeNum = Number(arrivalTime) || 18.0;
+  const currentPeakVel = Number(peakVelocity) || 89.1;
 
   // Chart dimensions
   const width = 640;
@@ -58,14 +47,61 @@ function HydrographChart({ timeSeries, peakVelocity = 102.37, activeTimeStep = 1
   const innerHeight = height - padding.top - padding.bottom;
 
   const maxT = useMemo(() => {
-    const vals = data.map((d) => (typeof d.time_s === "number" ? d.time_s : 0));
-    return Math.max(...vals, 61);
-  }, [data]);
+    return Math.max(60, Math.ceil((warnTimeNum + 5) / 10) * 10);
+  }, [warnTimeNum]);
+
+  const data = useMemo(() => {
+    const base = (Array.isArray(timeSeries) && timeSeries.length > 0)
+      ? [...timeSeries]
+      : [...DEFAULT_SPH_TIME_SERIES];
+    
+    // Scale velocities relative to peakVelocity dynamically
+    const scaleFactor = currentPeakVel / 102.37;
+    let formatted = base.map((pt) => ({
+      ...pt,
+      max_velocity_mps: Number((pt.max_velocity_mps * scaleFactor).toFixed(2)),
+      mean_velocity_mps: Number((pt.mean_velocity_mps * scaleFactor).toFixed(2)),
+    }));
+
+    // If warning time extends beyond 60s, extend curve smoothly to maxT so graph is full & continuous
+    const lastPt = formatted[formatted.length - 1];
+    const lastTime = lastPt ? lastPt.time_s : 61;
+    if (maxT > lastTime) {
+      // Intermediate warning point
+      formatted.push({
+        time_s: Number(warnTimeNum.toFixed(1)),
+        particle_count: 2806,
+        max_velocity_mps: Number((currentPeakVel * 0.32).toFixed(2)),
+        mean_velocity_mps: Number((currentPeakVel * 0.08).toFixed(2)),
+        front_position_x_local_m: 1400.0,
+      });
+      // Tail point at maxT
+      formatted.push({
+        time_s: maxT,
+        particle_count: 800,
+        max_velocity_mps: 0.0,
+        mean_velocity_mps: 0.0,
+        front_position_x_local_m: 0.0,
+      });
+    }
+
+    return formatted;
+  }, [timeSeries, currentPeakVel, warnTimeNum, maxT]);
+
+  // Clean, evenly spaced X-axis ticks to prevent label collision
+  const xTicks = useMemo(() => {
+    const ticks = [];
+    const step = Math.max(10, Math.ceil(maxT / 5 / 10) * 10);
+    for (let t = 0; t <= maxT; t += step) {
+      ticks.push(t);
+    }
+    return ticks;
+  }, [maxT]);
 
   const maxV = useMemo(() => {
     const vals = data.map((d) => (typeof d.max_velocity_mps === "number" ? d.max_velocity_mps : 0));
-    return Math.max(...vals, 110);
-  }, [data]);
+    return Math.max(...vals, currentPeakVel + 15, 100);
+  }, [data, currentPeakVel]);
 
   const scaleX = (t) => {
     const val = typeof t === "number" && !isNaN(t) ? t : 0;
@@ -103,15 +139,15 @@ function HydrographChart({ timeSeries, peakVelocity = 102.37, activeTimeStep = 1
 
   // Find peak point
   const peakPoint = useMemo(() => {
-    if (!data || data.length === 0) return { time_s: 12.0, max_velocity_mps: 102.37, particle_count: 4613 };
+    if (!data || data.length === 0) return { time_s: 12.0, max_velocity_mps: currentPeakVel, particle_count: 4613 };
     return data.reduce((prev, curr) => ((curr.max_velocity_mps || 0) > (prev.max_velocity_mps || 0) ? curr : prev), data[0]);
-  }, [data]);
+  }, [data, currentPeakVel]);
 
-  // Warning point at t=18s
+  // Warning point at t = warnTimeNum
   const warningPoint = useMemo(() => {
-    if (!data || data.length === 0) return { time_s: 18.0, max_velocity_mps: 89.5 };
-    return data.find((d) => Math.abs(d.time_s - 18.0) < 0.5) || { time_s: 18.0, max_velocity_mps: 89.5 };
-  }, [data]);
+    if (!data || data.length === 0) return { time_s: warnTimeNum, max_velocity_mps: currentPeakVel * 0.32 };
+    return data.find((d) => Math.abs(d.time_s - warnTimeNum) < 2.0) || { time_s: warnTimeNum, max_velocity_mps: currentPeakVel * 0.32 };
+  }, [data, warnTimeNum, currentPeakVel]);
 
   const activePoint = hoveredPoint || (activeTimeStep !== null ? data.find((d) => Math.abs(d.time_s - activeTimeStep) < 1.0) : peakPoint);
 
@@ -123,7 +159,7 @@ function HydrographChart({ timeSeries, peakVelocity = 102.37, activeTimeStep = 1
             <span>🌊</span> Velocity Hydrograph (DualSPHysics Solver)
           </h3>
           <div style={{ fontSize: "0.75rem", color: "#94a3b8" }}>
-            Peak Flow Velocity &amp; Arrival Dynamics over Time (t = 0 to 61s)
+            Peak Velocity: <strong style={{ color: "#ef4444" }}>{currentPeakVel} m/s</strong> · Arrival Window: <strong style={{ color: "#fbbf24" }}>{warnTimeNum.toFixed(1)}s</strong> · Peak Discharge: <strong style={{ color: "#38bdf8" }}>{Number(peakDischarge).toLocaleString()} m³/s</strong>
           </div>
         </div>
 
@@ -160,8 +196,8 @@ function HydrographChart({ timeSeries, peakVelocity = 102.37, activeTimeStep = 1
             </linearGradient>
           </defs>
 
-          {/* Grid lines */}
-          {[0, 25, 50, 75, 100].map((v) => (
+          {/* Y-axis Grid lines */}
+          {[0, Math.round(maxV * 0.25), Math.round(maxV * 0.5), Math.round(maxV * 0.75), Math.round(maxV)].map((v) => (
             <g key={`grid-y-${v}`}>
               <line
                 x1={padding.left}
@@ -183,23 +219,23 @@ function HydrographChart({ timeSeries, peakVelocity = 102.37, activeTimeStep = 1
             </g>
           ))}
 
-          {[0, 10, 18, 30, 40, 50, 60].map((t) => (
+          {/* X-axis Even Grid Ticks */}
+          {xTicks.map((t) => (
             <g key={`grid-x-${t}`}>
               <line
                 x1={scaleX(t)}
                 y1={padding.top}
                 x2={scaleX(t)}
                 y2={height - padding.bottom}
-                stroke={t === 18 ? "#f59e0b" : "#334155"}
-                strokeDasharray={t === 18 ? "4 2" : "3 3"}
-                strokeWidth={t === 18 ? 1.5 : 1}
+                stroke="#334155"
+                strokeDasharray="3 3"
+                strokeWidth={1}
               />
               <text
                 x={scaleX(t)}
                 y={height - padding.bottom + 16}
-                fill={t === 18 ? "#f59e0b" : "#94a3b8"}
+                fill="#94a3b8"
                 fontSize="10"
-                fontWeight={t === 18 ? "bold" : "normal"}
                 textAnchor="middle"
               >
                 {t}s
@@ -207,14 +243,14 @@ function HydrographChart({ timeSeries, peakVelocity = 102.37, activeTimeStep = 1
             </g>
           ))}
 
-          {/* Warning arrival line highlight */}
+          {/* Dynamic Warning arrival line highlight */}
           <line
-            x1={scaleX(18.0)}
+            x1={scaleX(warnTimeNum)}
             y1={padding.top}
-            x2={scaleX(18.0)}
+            x2={scaleX(warnTimeNum)}
             y2={height - padding.bottom}
             stroke="#f59e0b"
-            strokeWidth="1.5"
+            strokeWidth="2"
             strokeDasharray="4 2"
           />
 
@@ -244,20 +280,20 @@ function HydrographChart({ timeSeries, peakVelocity = 102.37, activeTimeStep = 1
           {peakPoint && (
             <g transform={`translate(${scaleX(peakPoint.time_s)}, ${scaleY(peakPoint.max_velocity_mps)})`}>
               <circle r="6" fill="#e94560" stroke="#ffffff" strokeWidth="2" />
-              <rect x="-42" y="-26" width="84" height="18" rx="4" fill="#e94560" opacity="0.95" />
+              <rect x="-45" y="-26" width="90" height="18" rx="4" fill="#e94560" opacity="0.95" />
               <text x="0" y="-14" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">
                 PEAK: {peakPoint.max_velocity_mps} m/s
               </text>
             </g>
           )}
 
-          {/* Warning arrival callout pin */}
+          {/* Dynamic Warning arrival callout pin */}
           {warningPoint && (
-            <g transform={`translate(${scaleX(18.0)}, ${scaleY(warningPoint.max_velocity_mps || 89.5)})`}>
-              <circle r="5" fill="#f59e0b" stroke="#ffffff" strokeWidth="1.5" />
-              <rect x="-48" y="8" width="96" height="16" rx="4" fill="#b45309" opacity="0.95" />
-              <text x="0" y="20" fill="#fef3c7" fontSize="8.5" fontWeight="bold" textAnchor="middle">
-                Warning: 18.0s (Reni)
+            <g transform={`translate(${scaleX(warnTimeNum)}, ${scaleY(warningPoint.max_velocity_mps || (currentPeakVel * 0.32))})`}>
+              <circle r="6" fill="#f59e0b" stroke="#ffffff" strokeWidth="2" />
+              <rect x="-56" y="8" width="112" height="18" rx="4" fill="#b45309" opacity="0.95" />
+              <text x="0" y="21" fill="#fef3c7" fontSize="9" fontWeight="bold" textAnchor="middle">
+                Warning: {warnTimeNum.toFixed(1)}s (Reni)
               </text>
             </g>
           )}

@@ -56,3 +56,9 @@ async def download_simulation(simulation_id: str, format: str):
     """Download simulation results in specified format."""
     return await SimulationService.download_result(simulation_id, format.lower())
 
+
+@router.get("/gis/analysis/{simulation_id}")
+async def get_gis_analysis(simulation_id: str):
+    """Get GIS damage statistics analysis for simulation."""
+    return await SimulationService.get_gis_analysis(simulation_id)
+
