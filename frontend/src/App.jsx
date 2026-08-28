@@ -81,9 +81,18 @@ function App() {
     }
   }, [isRunning, error, simulationStatus]);
 
+  const [activeTab, setActiveTab] = React.useState("Simulation");
+
   return (
     <div className="app">
-      <Header />
+      <Header
+        onSubmit={handleStartSimulation}
+        isRunning={isRunning}
+        reachKey={form.river_dam}
+        scenarioId={form.scenario_id}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
 
       <div className="main-layout">
         <ControlPanel
@@ -97,23 +106,30 @@ function App() {
         />
 
         <main className="main-content">
-          <MapDisplay
-            floodExtent={floodExtent}
-            currentResult={currentResult}
-            comparison={comparison}
-            isRunning={isRunning}
-          />
+          <div id="map-section">
+            <MapDisplay
+              floodExtent={floodExtent}
+              currentResult={currentResult}
+              comparison={comparison}
+              isRunning={isRunning}
+            />
+          </div>
 
           <div className="panels-wrapper">
-            <ResultsPanel
-              currentResult={currentResult}
-              comparison={comparison}
-            />
-            <ComparisonPanel
-              comparison={comparison}
-              currentResult={currentResult}
-              ModelType={ModelType}
-            />
+            <div id="results-section">
+              <ResultsPanel
+                currentResult={currentResult}
+                comparison={comparison}
+              />
+            </div>
+
+            <div id="comparison-section">
+              <ComparisonPanel
+                comparison={comparison}
+                currentResult={currentResult}
+                ModelType={ModelType}
+              />
+            </div>
           </div>
         </main>
       </div>

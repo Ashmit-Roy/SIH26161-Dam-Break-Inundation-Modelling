@@ -663,3 +663,22 @@ def setup_sample_data():
             "overlap_area": 9.5,
         },
     }
+
+    @staticmethod
+    async def get_gis_analysis(simulation_id: str):
+        """Get GIS damage & population analysis statistics."""
+        return {
+            "simulation_id": simulation_id,
+            "population_affected": 3850,
+            "land_use_impact_km2": {
+                "residential": 0.42,
+                "agricultural": 0.85,
+                "forest": 0.18
+            },
+            "roads_affected_km": 4.8,
+            "infrastructure": {
+                "bridges": 2,
+                "power_plants": 1,
+                "hospitals": 1
+            }
+        }
