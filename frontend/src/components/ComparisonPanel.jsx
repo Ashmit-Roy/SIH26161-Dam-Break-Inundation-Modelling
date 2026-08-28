@@ -79,10 +79,10 @@ function ComparisonPanel({
           <div className="comparison-details" style={{ marginTop: "12px", background: "rgba(15, 23, 42, 0.6)", padding: "12px 16px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)", color: "#cbd5e1", fontSize: "0.82rem" }}>
             <h4 style={{ color: "#38bdf8", marginBottom: "6px" }}>Hydrodynamic Comparison Summary for Judges:</h4>
             <p style={{ marginBottom: "6px" }}>
-              • <b>Velocity & Arrival Variance:</b> 3D SPH predicts <b>{velDiff} m/s higher surge speeds</b> and <b>{arrivalDiff}s faster wave arrival</b> because SPH includes 3D vertical acceleration down steep canyon chutes ($\Delta Z = 374\text{m}$) without hydrostatic damping.
+              • <b>Velocity & Arrival Variance:</b> 3D SPH predicts <b>{velDiff} m/s higher surge speeds</b> and <b>{arrivalDiff}s faster wave arrival</b> because SPH includes 3D vertical acceleration down steep canyon chutes (ΔZ = 374 m) without hydrostatic damping.
             </p>
             <p style={{ marginBottom: "6px" }}>
-              • <b>Depth & Floodplain Spreading:</b> 2D HEC-RAS predicts <b>{depthDiff}m greater depth-averaged ponding</b> because HEC-RAS models broader 2D lateral floodplain spreading and bed roughness ($n=0.045$).
+              • <b>Depth & Floodplain Spreading:</b> 2D HEC-RAS predicts <b>{depthDiff}m greater depth-averaged ponding</b> because HEC-RAS models broader 2D lateral floodplain spreading and bed roughness (Manning's n = 0.045).
             </p>
             <p>
               • <b>Cross-Validation Value:</b> Combining 3D SPH (for canyon breach initiation) with 2D HEC-RAS (for downstream floodplain routing) provides the most comprehensive disaster management decision support.

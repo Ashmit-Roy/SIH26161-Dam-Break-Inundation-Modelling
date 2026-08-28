@@ -24,6 +24,165 @@ function ResultsPanel({
   const breachWidth = currentResult?.breach_width || 15;
   const breachHeight = currentResult?.breach_height || 3;
 
+  const handlePrintDossier = () => {
+    const printWindow = window.open("", "_blank", "width=850,height=900");
+    if (!printWindow) {
+      window.print();
+      return;
+    }
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>National Dam Safety Disaster Dossier (EAP) - SIH26161</title>
+          <style>
+            body {
+              font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+              color: #1e293b;
+              padding: 36px;
+              margin: 0;
+              line-height: 1.6;
+            }
+            .header {
+              border-bottom: 3px solid #dc2626;
+              padding-bottom: 14px;
+              margin-bottom: 20px;
+            }
+            .header h1 {
+              margin: 0 0 6px 0;
+              font-size: 22pt;
+              color: #991b1b;
+              display: flex;
+              align-items: center;
+              gap: 10px;
+            }
+            .header .sub {
+              font-size: 11pt;
+              color: #64748b;
+              font-weight: 600;
+            }
+            .alert-banner {
+              background: #fee2e2;
+              border: 1px solid #f87171;
+              border-left: 6px solid #dc2626;
+              padding: 14px 18px;
+              border-radius: 6px;
+              margin-bottom: 24px;
+            }
+            .alert-banner strong {
+              color: #991b1b;
+              font-size: 12pt;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-bottom: 26px;
+            }
+            th, td {
+              padding: 11px 14px;
+              text-align: left;
+              font-size: 10.5pt;
+              border-bottom: 1px solid #e2e8f0;
+            }
+            tr:nth-child(even) {
+              background-color: #f8fafc;
+            }
+            td.label {
+              font-weight: bold;
+              width: 42%;
+              color: #334155;
+            }
+            td.val {
+              color: #0f172a;
+            }
+            .badge-red {
+              color: #dc2626;
+              font-weight: bold;
+            }
+            .badge-blue {
+              color: #0284c7;
+              font-weight: bold;
+            }
+            .badge-amber {
+              color: #d97706;
+              font-weight: bold;
+            }
+            h3 {
+              color: #0f172a;
+              font-size: 13pt;
+              margin: 22px 0 10px 0;
+            }
+            ol {
+              padding-left: 24px;
+              font-size: 10.5pt;
+              color: #334155;
+              line-height: 1.8;
+            }
+            .footer {
+              margin-top: 45px;
+              border-top: 1px solid #cbd5e1;
+              padding-top: 14px;
+              font-size: 9pt;
+              color: #94a3b8;
+              display: flex;
+              justify-content: space-between;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>🚨 National Dam Safety Disaster Dossier (EAP)</h1>
+            <div class="sub">Official Smart India Hackathon (SIH26161) — Emergency Evacuation & Risk Mitigation Protocol</div>
+          </div>
+
+          <div class="alert-banner">
+            <strong>⚠️ NDMA ALERT LEVEL 3: SEVERE INUNDATION SURGE</strong><br>
+            <span>Immediate evacuation authorized for downstream river reaches and low-lying settlements.</span>
+          </div>
+
+          <table>
+            <tbody>
+              <tr><td class="label">Study Reach & River Basin:</td><td class="val badge-blue">${reachName}</td></tr>
+              <tr><td class="label">Alert Classification:</td><td class="val badge-red">RED ALERT — CRITICAL DAM BREACH</td></tr>
+              <tr><td class="label">Breach Dimension (W × H):</td><td class="val">${breachWidth} m width × ${breachHeight} m depth</td></tr>
+              <tr><td class="label">Peak Discharge (Q_p):</td><td class="val badge-blue">${Number(peakDischarge).toLocaleString()} m³/s</td></tr>
+              <tr><td class="label">Peak Surge Velocity:</td><td class="val badge-red">${peakVel} m/s (${peakVelKmh} km/h)</td></tr>
+              <tr><td class="label">Critical Wave Arrival Time:</td><td class="val badge-amber">${arrivalTimeS} seconds</td></tr>
+              <tr><td class="label">Max Flood Depth (h_max):</td><td class="val">${maxDepth} meters</td></tr>
+              <tr><td class="label">Population at Direct Risk:</td><td class="val"><strong style="color: #dc2626;">${popRisk}</strong> residents</td></tr>
+              <tr><td class="label">Infrastructure Impact:</td><td class="val">${currentResult?.bridges_affected || "2 bridges impacted"}</td></tr>
+            </tbody>
+          </table>
+
+          <h3>📋 Standard Emergency Operating Directives:</h3>
+          <ol>
+            <li>Immediately sound downstream civil defense sirens within the <strong>${arrivalTimeS}s</strong> window.</li>
+            <li>Halt all vehicular traffic on river corridor bridges and highways.</li>
+            <li>Evacuate workers and residents to pre-designated high-ground relief centers above the <strong>${maxDepth}m</strong> inundation level.</li>
+            <li>Notify the State Emergency Operations Center (SEOC) & National Disaster Response Force (NDRF).</li>
+          </ol>
+
+          <div class="footer">
+            <span>SIH26161 Hydrodynamic Dam-Break Decision Support System</span>
+            <span>Generated: ${new Date().toLocaleString()}</span>
+          </div>
+
+          <script>
+            window.onload = function() {
+              window.focus();
+              window.print();
+            };
+          </script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.open();
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+  };
+
   return (
     <div className="results-panel">
       {/* Header with EAP action */}
@@ -273,34 +432,11 @@ function ResultsPanel({
 
       {/* EAP Dossier Modal */}
       {showEAPModal && (
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          backgroundColor: "rgba(0, 0, 0, 0.75)",
-          backdropFilter: "blur(6px)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 9999,
-        }}>
-          <div style={{
-            background: "#0f172a",
-            color: "#f8fafc",
-            width: "90%",
-            maxWidth: "720px",
-            maxHeight: "90vh",
-            overflowY: "auto",
-            borderRadius: "12px",
-            padding: "24px",
-            border: "1px solid rgba(239, 68, 68, 0.4)",
-            boxShadow: "0 20px 40px rgba(0,0,0,0.6)",
-          }}>
-            <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "2px solid #e94560", paddingBottom: "12px" }}>
+        <div className="eap-modal-overlay">
+          <div className="eap-modal-content">
+            <div className="eap-modal-header">
               <div>
-                <h2 style={{ margin: 0, color: "#f8fafc", display: "flex", alignItems: "center", gap: "8px" }}>
+                <h2 style={{ margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
                   🚨 National Dam Safety Disaster Dossier (EAP)
                 </h2>
                 <div style={{ fontSize: "0.85rem", color: "#94a3b8" }}>
@@ -308,6 +444,7 @@ function ResultsPanel({
                 </div>
               </div>
               <button
+                className="eap-no-print"
                 onClick={() => setShowEAPModal(false)}
                 style={{ background: "none", border: "none", fontSize: "1.5rem", color: "#94a3b8", cursor: "pointer" }}
               >
@@ -316,12 +453,12 @@ function ResultsPanel({
             </div>
 
             <div style={{ marginTop: "16px", lineHeight: "1.6" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "16px", fontSize: "0.85rem", color: "#e2e8f0" }}>
+              <table className="eap-table">
                 <tbody>
                   <tr style={{ background: "#1e293b" }}><td style={{ padding: "8px", fontWeight: "bold" }}>Study Reach & River Basin:</td><td style={{ color: "#38bdf8" }}>{reachName}</td></tr>
                   <tr><td style={{ padding: "8px", fontWeight: "bold" }}>Alert Classification:</td><td style={{ color: "#ef4444", fontWeight: "bold" }}>RED ALERT — CRITICAL DAM BREACH</td></tr>
-                  <tr style={{ background: "#1e293b" }}><td style={{ padding: "8px", fontWeight: "bold" }}>Breach Dimension ($W \times H$):</td><td>{breachWidth} m width × {breachHeight} m depth</td></tr>
-                  <tr><td style={{ padding: "8px", fontWeight: "bold" }}>Peak Discharge ($Q_p$):</td><td style={{ color: "#38bdf8", fontWeight: "bold" }}>{Number(peakDischarge).toLocaleString()} m³/s</td></tr>
+                  <tr style={{ background: "#1e293b" }}><td style={{ padding: "8px", fontWeight: "bold" }}>Breach Dimension (W × H):</td><td>{breachWidth} m width × {breachHeight} m depth</td></tr>
+                  <tr><td style={{ padding: "8px", fontWeight: "bold" }}>Peak Discharge (Q_p):</td><td style={{ color: "#38bdf8", fontWeight: "bold" }}>{Number(peakDischarge).toLocaleString()} m³/s</td></tr>
                   <tr style={{ background: "#1e293b" }}><td style={{ padding: "8px", fontWeight: "bold" }}>Peak Surge Velocity:</td><td style={{ color: "#ef4444", fontWeight: "bold" }}>{peakVel} m/s ({peakVelKmh} km/h)</td></tr>
                   <tr><td style={{ padding: "8px", fontWeight: "bold" }}>Critical Arrival Time:</td><td style={{ color: "#f59e0b", fontWeight: "bold" }}>{arrivalTimeS} seconds</td></tr>
                   <tr style={{ background: "#1e293b" }}><td style={{ padding: "8px", fontWeight: "bold" }}>Population at Direct Risk:</td><td><strong style={{ color: "#f87171" }}>{popRisk}</strong> residents</td></tr>
@@ -338,9 +475,9 @@ function ResultsPanel({
               </ol>
             </div>
 
-            <div style={{ marginTop: "24px", display: "flex", justifyContent: "flex-end", gap: "12px" }}>
+            <div className="eap-no-print" style={{ marginTop: "24px", display: "flex", justifyContent: "flex-end", gap: "12px" }}>
               <button
-                onClick={() => window.print()}
+                onClick={handlePrintDossier}
                 style={{ background: "#0284c7", color: "#fff", border: "none", borderRadius: "6px", padding: "10px 18px", cursor: "pointer", fontWeight: "bold" }}
               >
                 🖨️ Print Emergency Action Plan

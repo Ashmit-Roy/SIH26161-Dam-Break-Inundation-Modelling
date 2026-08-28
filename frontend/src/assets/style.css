@@ -791,4 +791,151 @@ html, body {
   .panels-wrapper {
     min-width: 100%;
   }
-}
+}
+
+/* EAP Modal Base Styling */
+.eap-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.eap-modal-content {
+  background: #0f172a;
+  color: #f8fafc;
+  width: 90%;
+  max-width: 720px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+.eap-modal-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 2px solid #e94560;
+  padding-bottom: 12px;
+}
+
+.eap-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+  color: #e2e8f0;
+}
+
+/* =========================================================
+   🖨️ HIGH-PRECISION PDF & PRINT STYLESHEET
+   ========================================================= */
+@media print {
+  body, html {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 11pt !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Hide everything on the dashboard except the Dossier modal */
+  .main-header,
+  .control-panel,
+  .main-content,
+  .map-area,
+  .flood-map-area,
+  .panels-wrapper,
+  .download-section,
+  .status-bar,
+  .eap-no-print {
+    display: none !important;
+  }
+
+  .eap-modal-overlay {
+    position: static !important;
+    background: none !important;
+    backdrop-filter: none !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .eap-modal-content {
+    position: static !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    border: 2px solid #dc2626 !important;
+    border-radius: 8px !important;
+    padding: 24px !important;
+    margin: 0 !important;
+  }
+
+  .eap-modal-header {
+    border-bottom: 2px solid #dc2626 !important;
+    padding-bottom: 12px !important;
+  }
+
+  .eap-modal-header h2 {
+    color: #111827 !important;
+    font-size: 16pt !important;
+  }
+
+  .eap-modal-header div {
+    color: #4b5563 !important;
+  }
+
+  .eap-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 16px 0 !important;
+    font-size: 10pt !important;
+    color: #111827 !important;
+  }
+
+  .eap-table tr {
+    border-bottom: 1px solid #e2e8f0 !important;
+  }
+
+  .eap-table tr:nth-child(even) {
+    background-color: #f8fafc !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .eap-table tr:nth-child(odd) {
+    background-color: #ffffff !important;
+  }
+
+  .eap-table td {
+    padding: 8px 12px !important;
+  }
+
+  ol {
+    color: #1f2937 !important;
+    font-size: 10pt !important;
+    line-height: 1.6 !important;
+  }
+
+  h4 {
+    color: #111827 !important;
+    margin-top: 16px !important;
+  }
+}
+
