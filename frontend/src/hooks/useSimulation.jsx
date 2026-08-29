@@ -126,29 +126,40 @@ export function useSimulation() {
     crs: "EPSG:32644 (UTM 44N)",
   });
 
-  // Synchronously compute hydrodynamics on every form update (0ms lag)
-  const currentResult = calculateHydrodynamics(form);
+  // Active hydrodynamic simulation result state
+  const [currentResult, setCurrentResult] = useState(() => calculateHydrodynamics(form));
 
-  const comparison = {
-    metric: "water_depth",
-    sph_data: {
-      simulation_id: form.simulation_id || "SPH-RISHIGANGA-001",
-      location: { lat: currentResult.location.lat, lon: currentResult.location.lon },
-      water_depth: currentResult.sph_metrics.depth,
-      peak_velocity: currentResult.sph_metrics.peak_vel,
-      arrival_time: currentResult.sph_metrics.arrival_s,
+  const [comparison, setComparison] = useState(() => {
+    const initialRes = calculateHydrodynamics(form);
+    return {
+      metric: "water_depth",
+      sph_data: {
+        simulation_id: form.simulation_id || "SPH-RISHIGANGA-001",
+        location: { lat: initialRes.location.lat, lon: initialRes.location.lon },
+        water_depth: initialRes.sph_metrics.depth,
+        peak_velocity: initialRes.sph_metrics.peak_vel,
+        arrival_time: initialRes.sph_metrics.arrival_s,
+        timestamp: new Date().toISOString(),
+      },
+      delft3d_data: {
+        simulation_id: "HECRAS-2D-001",
+        location: { lat: initialRes.location.lat, lon: initialRes.location.lon },
+        water_depth: initialRes.hecras_metrics.depth,
+        peak_velocity: initialRes.hecras_metrics.peak_vel,
+        arrival_time: initialRes.hecras_metrics.arrival_s,
+        timestamp: new Date().toISOString(),
+      },
+      hecras_data: {
+        simulation_id: "HECRAS-2D-001",
+        location: { lat: initialRes.location.lat, lon: initialRes.location.lon },
+        water_depth: initialRes.hecras_metrics.depth,
+        peak_velocity: initialRes.hecras_metrics.peak_vel,
+        arrival_time: initialRes.hecras_metrics.arrival_s,
+        timestamp: new Date().toISOString(),
+      },
       timestamp: new Date().toISOString(),
-    },
-    delft3d_data: {
-      simulation_id: "HECRAS-2D-001",
-      location: { lat: currentResult.location.lat, lon: currentResult.location.lon },
-      water_depth: currentResult.hecras_metrics.depth,
-      peak_velocity: currentResult.hecras_metrics.peak_vel,
-      arrival_time: currentResult.hecras_metrics.arrival_s,
-      timestamp: new Date().toISOString(),
-    },
-    timestamp: new Date().toISOString(),
-  };
+    };
+  });
 
   const [floodExtent, setFloodExtent] = useState({
     simulation_id: "SPH-RISHIGANGA-001",
@@ -240,6 +251,57 @@ export function useSimulation() {
     []
   );
 
+  // Helper to apply solver results to state
+  const applySolverResults = useCallback((simPayload) => {
+    const freshResult = calculateHydrodynamics(simPayload);
+    setCurrentResult(freshResult);
+    setComparison({
+      metric: "water_depth",
+      sph_data: {
+        simulation_id: simPayload.simulation_id,
+        location: { lat: freshResult.location.lat, lon: freshResult.location.lon },
+        water_depth: freshResult.sph_metrics.depth,
+        peak_velocity: freshResult.sph_metrics.peak_vel,
+        arrival_time: freshResult.sph_metrics.arrival_s,
+        timestamp: new Date().toISOString(),
+      },
+      delft3d_data: {
+        simulation_id: `HECRAS-2D-${Date.now().toString(36).slice(-4).toUpperCase()}`,
+        location: { lat: freshResult.location.lat, lon: freshResult.location.lon },
+        water_depth: freshResult.hecras_metrics.depth,
+        peak_velocity: freshResult.hecras_metrics.peak_vel,
+        arrival_time: freshResult.hecras_metrics.arrival_s,
+        timestamp: new Date().toISOString(),
+      },
+      hecras_data: {
+        simulation_id: `HECRAS-2D-${Date.now().toString(36).slice(-4).toUpperCase()}`,
+        location: { lat: freshResult.location.lat, lon: freshResult.location.lon },
+        water_depth: freshResult.hecras_metrics.depth,
+        peak_velocity: freshResult.hecras_metrics.peak_vel,
+        arrival_time: freshResult.hecras_metrics.arrival_s,
+        timestamp: new Date().toISOString(),
+      },
+      timestamp: new Date().toISOString(),
+    });
+    setFloodExtent({
+      simulation_id: simPayload.simulation_id,
+      polygon: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [freshResult.location.lat - 0.015, freshResult.location.lon + 0.006],
+            [freshResult.location.lat - 0.012, freshResult.location.lon],
+            [freshResult.location.lat - 0.008, freshResult.location.lon - 0.008],
+            [freshResult.location.lat - 0.005, freshResult.location.lon - 0.011],
+            [freshResult.location.lat - 0.007, freshResult.location.lon - 0.003],
+            [freshResult.location.lat - 0.015, freshResult.location.lon + 0.006],
+          ]
+        ],
+      },
+      arrival_time: freshResult.arrival_time_min,
+    });
+  }, []);
+
   // Start simulation
   const handleStartSimulation = useCallback(async (formValuesOrEvent) => {
     if (formValuesOrEvent && typeof formValuesOrEvent.preventDefault === "function") {
@@ -294,6 +356,7 @@ export function useSimulation() {
 
       // Simulate 1.8s of numerical solver computing cycle for realistic solver execution
       setTimeout(() => {
+        applySolverResults(payload);
         setIsRunning(false);
         setProgress(100);
       }, 1800);
@@ -301,11 +364,12 @@ export function useSimulation() {
     } catch (err) {
       console.log("Using instant hydrodynamic solver pipeline");
       setTimeout(() => {
+        applySolverResults(payload);
         setIsRunning(false);
         setProgress(100);
       }, 1800);
     }
-  }, [form]);
+  }, [form, applySolverResults]);
 
   // Load results after simulation ID changes (for cases where results are available separately)
   useEffect(() => {
@@ -315,7 +379,9 @@ export function useSimulation() {
       try {
         const simResult = await getSimulationResult(state.current_simulation);
         if (simResult) {
-          if (simResult.water_depth) setCurrentResult(simResult.water_depth);
+          if (simResult.water_depth && typeof simResult.water_depth === 'object') {
+            setCurrentResult(simResult.water_depth);
+          }
           if (simResult.flood_extent) setFloodExtent(simResult.flood_extent);
 
           // Get comparison if applicable
