@@ -636,19 +636,33 @@ function MapDisplay({
           <div style={{ marginBottom: "10px", background: "rgba(15, 23, 42, 0.6)", padding: "8px 10px", borderRadius: "6px", border: "1px solid rgba(239,68,68,0.3)" }}>
             <div style={{ fontSize: "0.68rem", color: "#94a3b8", textTransform: "uppercase" }}>Population at Risk (PAR)</div>
             <div style={{ fontSize: "1.75rem", fontWeight: 900, color: "#ef4444", textShadow: "0 0 12px rgba(239,68,68,0.6)", lineHeight: 1.1 }}>
-              3,850 <span style={{ fontSize: "0.85rem", color: "#fca5a5", fontWeight: 600 }}>lives</span>
+              {currentResult?.population_at_risk
+                ? (typeof currentResult.population_at_risk === 'number'
+                    ? currentResult.population_at_risk.toLocaleString()
+                    : currentResult.population_at_risk)
+                : "3,850"} <span style={{ fontSize: "0.85rem", color: "#fca5a5", fontWeight: 600 }}>lives</span>
             </div>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
             <div style={{ background: "rgba(15, 23, 42, 0.6)", padding: "6px 8px", borderRadius: "6px", border: "1px solid #31394d" }}>
               <div style={{ fontSize: "0.65rem", color: "#94a3b8" }}>Time to 1st Impact</div>
-              <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#fb923c" }}>00:18:00</div>
+              <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#fb923c" }}>
+                {currentResult?.arrival_time_min
+                  ? `${currentResult.arrival_time_min} min`
+                  : (currentResult?.arrival_time_s
+                      ? `${(currentResult.arrival_time_s / 60).toFixed(1)} min`
+                      : "00:18:00")}
+              </div>
             </div>
             <div style={{ background: "rgba(15, 23, 42, 0.6)", padding: "6px 8px", borderRadius: "6px", border: "1px solid #31394d" }}>
               <div style={{ fontSize: "0.65rem", color: "#94a3b8" }}>Wave Velocity</div>
               <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#38bdf8" }}>
-                {currentResult?.peak_velocity_mps || 89.1} m/s
+                {currentResult?.peak_velocity_mps
+                  ? (typeof currentResult.peak_velocity_mps === 'number'
+                      ? currentResult.peak_velocity_mps.toFixed(1)
+                      : currentResult.peak_velocity_mps)
+                  : "62.2"} m/s
               </div>
             </div>
           </div>
@@ -678,8 +692,8 @@ function MapDisplay({
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
             <div style={{ width: "12px", height: "70px", background: "linear-gradient(to bottom, #d946ef, #a855f7, #0284c7, #06b6d4)", borderRadius: "3px", border: "1px solid #31394d" }}></div>
             <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "70px", fontSize: "0.7rem", color: "#94a3b8" }}>
-              <span>15m+ (Catastrophic Core)</span>
-              <span>7.5m (Deep Overflow)</span>
+              <span>{currentResult?.water_depth_m || currentResult?.water_depth ? `${((currentResult.water_depth_m || currentResult.water_depth) * 1.5).toFixed(1)}m+ (Catastrophic Core)` : "15m+ (Catastrophic Core)"}</span>
+              <span>{currentResult?.water_depth_m || currentResult?.water_depth ? `${(currentResult.water_depth_m || currentResult.water_depth).toFixed(1)}m (Deep Overflow)` : "7.5m (Deep Overflow)"}</span>
               <span>0m (Flood Fringe)</span>
             </div>
           </div>
